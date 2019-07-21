@@ -1,0 +1,40 @@
+version: "3"
+services:
+
+  api:
+    build:
+      context: ./docker/api
+    environment:
+      - ENV=DEV
+      - PORT=5000
+    # env_file: ./docker/api/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: ./docker/mysql
+      # dockerfile: ./docker/mysql/Dockerfile
+    restart: always
+    environment:
+      MYSQL_DATABASE: sample_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+    - ./docker/mysql/sql:/docker-entrypoint-initdb.d
+    - ./docker/mysql/data:/var/lib/mysql
+    - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+
+  nginx:
+    build:
+      context: ./docker/nginx
+      # dockerfile: ./docker/nginx/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
