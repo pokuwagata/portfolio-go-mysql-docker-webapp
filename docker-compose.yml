@@ -3,7 +3,7 @@ services:
 
   api:
     build:
-      context: ./docker/api
+      context: ./api
     environment:
       - ENV=DEV
       - PORT=5000
@@ -15,8 +15,7 @@ services:
 
   db:
     build:
-      context: ./docker/mysql
-      # dockerfile: ./docker/mysql/Dockerfile
+      context: ./mysql
     restart: always
     environment:
       MYSQL_DATABASE: sample_db
@@ -26,14 +25,13 @@ services:
     ports:
       - "3306:3306"
     volumes:
-    - ./docker/mysql/sql:/docker-entrypoint-initdb.d
-    - ./docker/mysql/data:/var/lib/mysql
-    - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./mysql/sql:/docker-entrypoint-initdb.d
+    - ./mysql/data:/var/lib/mysql
+    - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
 
   nginx:
     build:
-      context: ./docker/nginx
-      # dockerfile: ./docker/nginx/Dockerfile
+      context: ./nginx
     ports:
       - "8080:80"
     depends_on:

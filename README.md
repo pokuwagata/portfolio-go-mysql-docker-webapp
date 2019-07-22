@@ -1,5 +1,7 @@
 # README
 
+![CircleCI](https://img.shields.io/circleci/build/github/pokuwagata/portfolio-go-mysql-docker-webapp.svg)
+
 simple webApp sample (React + Go + MySQL)
 
 ## Features
