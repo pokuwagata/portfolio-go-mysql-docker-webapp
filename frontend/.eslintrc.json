@@ -1,0 +1,10 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "rules": {
+      "no-unused-vars": "error",
+      "no-unreachable": "error"
+    }
+}
