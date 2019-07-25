@@ -3,18 +3,18 @@ jobs:
   eslint:
     docker:
       - image: circleci/node:8.11.3
-    
+
     steps:
       - checkout
       - run:
-        - name: lint
-        - command: |
-          mkdir -p /tmp/test-reports/eslint
-          cd ./frontend
-          npm install
-          cd ./src
-          npx eslint . --format junit --output-file /tmp/test-reports/eslint/results.xml
-        - store_test_results:
+          name: lint
+          command: |
+            mkdir -p /tmp/test-reports/eslint
+            cd ./frontend
+            npm install
+            cd ./src
+            npx eslint . --format junit --output-file /tmp/test-reports/eslint/results.xml
+      - store_test_results:
           path: /tmp/test-reports
 
   build:
