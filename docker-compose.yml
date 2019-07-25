@@ -1,4 +1,4 @@
-version: "3"
+version: "3.4"
 services:
 
   api:
@@ -28,11 +28,23 @@ services:
     - ./mysql/sql:/docker-entrypoint-initdb.d
     - ./mysql/data:/var/lib/mysql
     - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+  
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    volumes:
+      - ./frontend/dist:/frontend/dist
+      - ./frontend/src:/frontend/src
 
   nginx:
     build:
-      context: ./nginx
+      context: ./frontend
+      target: nginx
     ports:
       - "8080:80"
     depends_on:
       - api
+      - frontend
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html/
