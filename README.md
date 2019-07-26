@@ -12,7 +12,7 @@ simple webApp sample (React + Go + MySQL)
 
 ## Requirements
 
-- Go 1.11 or higher
+- Docker Compose
 
 ## Getting Started
 
