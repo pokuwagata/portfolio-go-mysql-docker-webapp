@@ -10,7 +10,7 @@ export interface AppProps {}
 
 export const App = (props: AppProps) => (
   <div>
-    <Header />
+    <Header isLoggedIn={true}/>
     <Switch>
       <Route exact path="/" component={ArticleList} />
       <Route path="/signup" component={Signup} />
