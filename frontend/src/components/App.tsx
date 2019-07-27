@@ -9,12 +9,14 @@ import { ArticleList } from './ArticleList';
 export interface AppProps {}
 
 export const App = (props: AppProps) => (
-  <div>
-    <Header isLoggedIn={true}/>
-    <Switch>
-      <Route exact path="/" component={ArticleList} />
-      <Route path="/signup" component={Signup} />
-      <Route path="/login" component={Login} />
-    </Switch>
-  </div>
+    <div>
+        <Header isLoggedIn={false} />
+        <div className="container">
+            <Switch>
+                <Route exact path="/" component={ArticleList} />
+                <Route path="/signup" component={Signup} />
+                <Route path="/login" component={Login} />
+            </Switch>
+        </div>
+    </div>
 );
