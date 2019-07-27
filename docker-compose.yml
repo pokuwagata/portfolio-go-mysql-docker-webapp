@@ -33,18 +33,8 @@ services:
     build:
       context: ./frontend
       target: dev
+    ports:
+      - "8080:8080"
     volumes:
       - ./frontend/dist:/frontend/dist
       - ./frontend/src:/frontend/src
-
-  nginx:
-    build:
-      context: ./frontend
-      target: nginx
-    ports:
-      - "8080:80"
-    depends_on:
-      - api
-      - frontend
-    volumes:
-      - ./frontend/dist:/usr/share/nginx/html/

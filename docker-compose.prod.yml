@@ -1,0 +1,21 @@
+version: "3.4"
+services:
+  frontend:
+    build:
+      context: ./frontend
+      target: build
+    volumes:
+      - ./frontend/dist:/frontend/dist
+      - ./frontend/src:/frontend/src
+
+  nginx:
+    build:
+      context: ./frontend
+      target: nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+      - frontend
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html/

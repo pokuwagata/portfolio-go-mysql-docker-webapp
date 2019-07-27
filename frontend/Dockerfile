@@ -2,7 +2,7 @@ FROM node:8.11 as dev
 WORKDIR /frontend
 COPY . .
 RUN npm install
-CMD ["npm", "run", "watch"]
+CMD ["npm", "run", "start"]
 
 FROM dev as build
 RUN npm run build
