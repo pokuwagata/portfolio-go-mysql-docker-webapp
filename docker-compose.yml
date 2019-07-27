@@ -8,6 +8,8 @@ services:
       - ENV=DEV
       - PORT=5000
     # env_file: ./docker/api/.env
+    expose:
+      - 5000
     ports:
       - "5000:5000"
     depends_on:
@@ -38,3 +40,5 @@ services:
     volumes:
       - ./frontend/dist:/frontend/dist
       - ./frontend/src:/frontend/src
+    links:
+      - api

@@ -5,18 +5,40 @@ import { Header } from './Header';
 import { Signup } from './Signup';
 import { Login } from './Login';
 import { ArticleList } from './ArticleList';
+import { Flush, FlushType } from './Flush';
 
 export interface AppProps {}
+export type AppState = {};
 
-export const App = (props: AppProps) => (
+export const App = (props: AppProps) => {
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [flushState, setFlushState] = React.useState({
+    isDisplay: false,
+    type: undefined,
+    message: '',
+  });
+
+  return (
     <div>
-        <Header isLoggedIn={false} />
-        <div className="container">
-            <Switch>
-                <Route exact path="/" component={ArticleList} />
-                <Route path="/signup" component={Signup} />
-                <Route path="/login" component={Login} />
-            </Switch>
-        </div>
+      <Header isLoggedIn={false} />
+      <Flush {...flushState} setFlushState={setFlushState} />
+      <div className="container">
+        <Switch>
+          <Route exact path="/" component={ArticleList} />
+          <Route
+            path="/signup"
+            render={props => (
+              <Signup
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+                setFlushState={setFlushState}
+                {...props}
+              />
+            )}
+          />
+          <Route path="/login" component={Login} />
+        </Switch>
+      </div>
     </div>
-);
+  );
+};
