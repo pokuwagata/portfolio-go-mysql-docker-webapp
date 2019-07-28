@@ -12,9 +12,13 @@ export type SignupProps = RouteComponentProps & {
 export const Signup = (props: SignupProps) => {
   const [username, setUsername] = React.useState('');
   const [usernameErrors, setUsernameErrors] = React.useState([]);
+  const [password, setPassword] = React.useState('');
+  const [passwordErrors, setPasswordErrors] = React.useState([]);
+
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    // 少なくとも1つのフォームにバリデーションエラーが発生している場合は処理を中断
+    if (!(validateUsername() && validatePassword())) return;
 
     // TODO: APIパス設定
     fetch('/api').then(
@@ -39,14 +43,6 @@ export const Signup = (props: SignupProps) => {
     );
   };
 
-  const validateForm = (): boolean => {
-    if (validateUsername()) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
   const validateUsername = (): boolean => {
     const errors = checkUsernameError();
     setUsernameErrors(errors);
@@ -68,6 +64,28 @@ export const Signup = (props: SignupProps) => {
     return errors;
   };
 
+  const validatePassword = (): boolean => {
+    const errors = checkPasswordError();
+    setPasswordErrors(errors);
+
+    return errors.length === 0;
+  };
+
+  const checkPasswordError = (): Array<string> => {
+    let errors = [];
+    if (password.length === 0) {
+      errors.push('パスワードを入力してください。');
+      return errors;
+    }
+    if (!RegExp('^[A-Za-z0-9]+$').test(password)) 
+      errors.push('半角英数字のみで入力してください。');
+    
+    if (password.length < 8)
+      errors.push('パスワードは8文字以上で入力してください。');
+    return errors;
+  };
+
+  //TODO: ユーザ名とパスワードのフォームは別コンポーネントとして切り出し検討
   return props.isLoggedIn ? (
     <Redirect to="/" />
   ) : (
@@ -93,13 +111,17 @@ export const Signup = (props: SignupProps) => {
           <div className="form-group row">
             <input
               type="password"
-              className="form-control"
+              className={
+                'form-control' +
+                (passwordErrors.length > 0 ? ' ' + 'is-invalid' : '')
+              }
               placeholder="Password"
-              minLength={8}
               maxLength={32}
-              // pattern="[A-Za-z0-9]"
-              // required
+              onChange={e => setPassword(e.target.value)}
             />
+            {passwordErrors.length > 0 && (
+              <div className="invalid-feedback">{passwordErrors.join('')}</div>
+            )}
           </div>
           <div className="form-group row justify-content-center">
             <button type="submit" className="btn btn-primary">
