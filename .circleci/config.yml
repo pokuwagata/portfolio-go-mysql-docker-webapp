@@ -13,7 +13,7 @@ jobs:
             cd ./frontend
             npm install
             cd ./src
-            npx eslint . --format junit --output-file /tmp/test-reports/eslint/results.xml
+            npx eslint components/* --format junit --output-file /tmp/test-reports/eslint/results.xml
       - store_test_results:
           path: /tmp/test-reports
 
