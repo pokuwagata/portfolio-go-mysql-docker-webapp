@@ -1,7 +1,8 @@
 FROM node:8.11 as dev
 WORKDIR /frontend
-COPY . .
+COPY package*.json ./
 RUN npm install
+COPY . .
 CMD ["npm", "run", "start"]
 
 FROM dev as build
