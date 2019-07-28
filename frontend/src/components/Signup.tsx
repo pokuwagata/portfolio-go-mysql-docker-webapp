@@ -15,7 +15,7 @@ export const Signup = (props: SignupProps) => {
   const [password, setPassword] = React.useState('');
   const [passwordErrors, setPasswordErrors] = React.useState([]);
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 少なくとも1つのフォームにバリデーションエラーが発生している場合は処理を中断
     if (!(validateUsername() && validatePassword())) return;
