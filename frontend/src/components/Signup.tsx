@@ -10,11 +10,14 @@ export type SignupProps = RouteComponentProps & {
 };
 
 export const Signup = (props: SignupProps) => {
-  const [username, setUserName] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [usernameErrors, setUsernameErrors] = React.useState([]);
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     // TODO: APIパス設定
-    fetch('/').then(
+    fetch('/api').then(
       res => {
         // TODO: 後で消す
         console.log(res);
@@ -36,25 +39,57 @@ export const Signup = (props: SignupProps) => {
     );
   };
 
+  const validateForm = (): boolean => {
+    if (validateUserName()) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const validateUserName = (): boolean => {
+    const errors = checkUserNameError();
+    setUsernameErrors(errors);
+
+    return errors.length === 0;
+  };
+
+  // TODO: userName → username
+  const checkUserNameError = (): Array<string> => {
+    let errors = [];
+    if (username.length === 0) {
+      errors.push('ユーザ名を入力してください。');
+      return errors;
+    }
+    if (!RegExp('^[A-Za-z0-9]+$').test(username)) 
+      errors.push('半角英数字のみで入力してください。');
+    
+    if (username.length < 4)
+      errors.push('ユーザ名は4文字以上で入力してください。');
+    return errors;
+  };
+
   return props.isLoggedIn ? (
     <Redirect to="/" />
   ) : (
     <div className="justify-content-center d-flex">
-      <div className="mx-auto">
+      <div className="mx-auto" style={{flex: '0 0 300px'}}>
         <h1>ユーザを登録する</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group row">
             <input
               type="text"
-              className="form-control"
+              className={
+                'form-control' +
+                (usernameErrors.length > 0 ? ' ' + 'is-invalid' : '')
+              }
               placeholder="Username"
-              minLength={4}
               maxLength={16}
-              // TODO: patternの挙動は後で調査
-              // pattern="[A-Za-z0-9]"
-              required
-              onChange={e => setUserName(e.target.value)}
+              onChange={e => setUsername(e.target.value)}
             />
+            {usernameErrors.length > 0 && (
+              <div className="invalid-feedback">{usernameErrors.join('')}</div>
+            )}
           </div>
           <div className="form-group row">
             <input
@@ -64,7 +99,7 @@ export const Signup = (props: SignupProps) => {
               minLength={8}
               maxLength={32}
               // pattern="[A-Za-z0-9]"
-              required
+              // required
             />
           </div>
           <div className="form-group row justify-content-center">
