@@ -40,22 +40,21 @@ export const Signup = (props: SignupProps) => {
   };
 
   const validateForm = (): boolean => {
-    if (validateUserName()) {
+    if (validateUsername()) {
       return true;
     } else {
       return false;
     }
   };
 
-  const validateUserName = (): boolean => {
-    const errors = checkUserNameError();
+  const validateUsername = (): boolean => {
+    const errors = checkUsernameError();
     setUsernameErrors(errors);
 
     return errors.length === 0;
   };
 
-  // TODO: userName → username
-  const checkUserNameError = (): Array<string> => {
+  const checkUsernameError = (): Array<string> => {
     let errors = [];
     if (username.length === 0) {
       errors.push('ユーザ名を入力してください。');
