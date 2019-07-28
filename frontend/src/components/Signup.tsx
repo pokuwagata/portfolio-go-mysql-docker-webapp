@@ -73,8 +73,8 @@ export const Signup = (props: SignupProps) => {
     <Redirect to="/" />
   ) : (
     <div className="justify-content-center d-flex">
-      <div className="mx-auto" style={{flex: '0 0 300px'}}>
-        <h1>ユーザを登録する</h1>
+      <div className="mx-auto" style={{flex: '0 0 400px'}}>
+        <h1 className="text-center">ユーザを登録する</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group row">
             <input
