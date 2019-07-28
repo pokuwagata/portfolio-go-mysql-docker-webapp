@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 import { FlushType } from './Flush';
+import { FlushState } from './App';
 
 export type SignupProps = RouteComponentProps & {
-  // TODO: 後で型定義
   isLoggedIn: boolean;
-  setIsLoggedIn: any;
-  setFlushState: any;
+  setIsLoggedIn: (state: boolean) => void;
+  setFlushState: (state: FlushState) => void;
 };
 
 export const Signup = (props: SignupProps) => {
@@ -36,8 +36,9 @@ export const Signup = (props: SignupProps) => {
         // TODO: 後で消す
         console.log(error);
         props.setFlushState({
-          isDisplayFlush: true,
-          flushType: FlushType.ERROR,
+          isDisplay: true,
+          type: FlushType.ERROR,
+          message: 'error'
         });
       }
     );
@@ -56,9 +57,9 @@ export const Signup = (props: SignupProps) => {
       errors.push('ユーザ名を入力してください。');
       return errors;
     }
-    if (!RegExp('^[A-Za-z0-9]+$').test(username)) 
+    if (!RegExp('^[A-Za-z0-9]+$').test(username))
       errors.push('半角英数字のみで入力してください。');
-    
+
     if (username.length < 4)
       errors.push('ユーザ名は4文字以上で入力してください。');
     return errors;
@@ -77,9 +78,9 @@ export const Signup = (props: SignupProps) => {
       errors.push('パスワードを入力してください。');
       return errors;
     }
-    if (!RegExp('^[A-Za-z0-9]+$').test(password)) 
+    if (!RegExp('^[A-Za-z0-9]+$').test(password))
       errors.push('半角英数字のみで入力してください。');
-    
+
     if (password.length < 8)
       errors.push('パスワードは8文字以上で入力してください。');
     return errors;
@@ -90,7 +91,7 @@ export const Signup = (props: SignupProps) => {
     <Redirect to="/" />
   ) : (
     <div className="justify-content-center d-flex">
-      <div className="mx-auto" style={{flex: '0 0 400px'}}>
+      <div className="mx-auto" style={{ flex: '0 0 400px' }}>
         <h1 className="text-center">ユーザを登録する</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group row">

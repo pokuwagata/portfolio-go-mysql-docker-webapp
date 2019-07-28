@@ -7,8 +7,13 @@ import { Login } from './Login';
 import { ArticleList } from './ArticleList';
 import { Flush, FlushType } from './Flush';
 
-export interface AppProps {}
-export type AppState = {};
+type AppProps = {};
+type AppState = {};
+export type FlushState = {
+  isDisplay: boolean;
+  type: FlushType;
+  message: string;
+};
 
 export const App = (props: AppProps) => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
