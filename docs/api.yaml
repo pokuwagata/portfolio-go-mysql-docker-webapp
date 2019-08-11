@@ -1,0 +1,173 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: portfolio-go-mysql-docker-webapp
+  license:
+    name: MIT
+servers:
+  - url: http://portfolio-go-mysql-docker-webapp.swagger.io/v1
+paths:
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "createUser"
+      requestBody:
+        description: "Created user object"
+        required: true
+        content:
+          application:json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        200:
+          description: "successful operation"
+        409:
+          description: "user already existed"
+          content:
+            application:json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                code: 409
+                message: "User already existed"
+          
+          
+  /user/login:
+    get:
+      tags:
+      - "user"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        schema:
+          type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          headers:
+            X-Rate-Limit:
+              description: "calls per hour allowed by the user"
+              schema:
+                type: "integer"
+                format: "int32"
+            X-Expires-After:
+              description: "date in UTC when token expires"
+              schema:
+                type: "string"
+                format: "date-time"
+        400:
+          description: "Invalid username/password supplied"
+          content:
+            application:json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                code: 400
+                message: "Invalid username/password supplied"
+            
+  /user/logout:
+    get:
+      tags:
+      - "user"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /user/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "Get user by user name"
+      description: ""
+      operationId: "getUserByName"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        404:
+          description: "User not found"
+          content:
+            application:json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                code: 404
+                message: "User not found"
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+      - "user"
+      summary: "Delete user"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteUser"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be deleted"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        404:
+          description: "User not found"
+          content:
+            application:json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                code: 404
+                message: "User not found"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
+      example:
+        username: user1
+        password: test
+    ErrorResponse:
+      type: "object"
+      properties:
+        code:
+          type: "integer"
+          format: "int32"
+        message:
+          type: "string"
