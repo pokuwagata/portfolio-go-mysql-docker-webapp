@@ -1,4 +1,9 @@
 FROM node:8.11 as dev
+
+ADD package.json /tmp/package.json
+RUN cd /tmp && npm install
+RUN mkdir /frontend && cp -a /tmp/node_modules /frontend
+
 WORKDIR /frontend
 COPY package*.json ./
 RUN npm install
