@@ -6,3 +6,4 @@
 !/**/.gitkeep
 /api/logs/*
 /docs/api-example.yaml
+/api/requestSample/

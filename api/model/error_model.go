@@ -1,6 +1,6 @@
-package error
+package model
 
-type Response struct {
+type ErrorResponse struct {
 	Code int `json:"code"`
 	Message string `json:"message"`
 }
