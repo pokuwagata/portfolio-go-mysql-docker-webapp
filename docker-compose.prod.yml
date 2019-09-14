@@ -1,5 +1,22 @@
 version: "3.4"
 services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      - ENV=PRD
+      - PORT=5000
+      - GO111MODULE=on
+    ports:
+      - "5000:5000"
+    volumes: 
+      - ./api/logs:/go/src/server/logs
+      - ./api/go.mod:/go/src/server/go.mod
+      - ./api/go.sum:/go/src/server/go.sum
+    depends_on:
+      - db
+
   frontend:
     build:
       context: ./frontend

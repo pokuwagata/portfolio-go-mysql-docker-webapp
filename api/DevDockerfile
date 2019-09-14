@@ -1,0 +1,13 @@
+FROM golang:1.12
+
+RUN sudo apt-get install git
+
+WORKDIR /go/src/server
+
+COPY go.mod .
+COPY go.sum .
+RUN GO111MODULE=on go mod download
+
+ADD . /go/src/server
+
+CMD /bin/bash
