@@ -1,20 +1,16 @@
 package usecase
 
 import (
-	"context"
-	"golang.org/x/crypto/bcrypt"
-
+	"api/constant"
 	"api/model"
+	"context"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepository interface {
 	Store(ctx context.Context, u *model.User) error
 }
-
-const (
-	VALID = "有効"
-	INVALID = "無効"
-)
 
 type UserUsecase struct {
 	r UserRepository
@@ -25,7 +21,7 @@ func NewUserUsecase(r UserRepository) *UserUsecase {
 }
 
 func (uu *UserUsecase) CreateUser(ctx context.Context, u *model.User) error {
-	u.Status = VALID
+	u.Status = constant.VALID
 
 	// hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)

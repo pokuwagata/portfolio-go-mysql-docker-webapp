@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+	"api/constant"
 	"api/model"
 	"context"
 	"database/sql"
@@ -27,4 +29,14 @@ func (ur *UserRepository) Store(ctx context.Context, u *model.User) error {
 	}
 
 	return nil
+}
+
+func (ur *UserRepository) GetPassword(ctx context.Context, s *model.Session) (string, error) {
+	var p string
+	query := `SELECT password FROM users WHERE username=? AND status_id=(SELECT id FROM user_statuses where status= ?)`
+	// usernameはユニークキー
+	if err := ur.db.QueryRowContext(ctx, query, s.Username, constant.VALID).Scan(&p); err != nil {
+		return "", errors.New("user not found")
+	}
+	return p, nil
 }

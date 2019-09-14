@@ -15,6 +15,7 @@ import (
 	"github.com/labstack/echo"
 )
 
+// hogehoge
 func main() {
 	e := echo.New()
 	logger.Init(e)
@@ -25,7 +26,9 @@ func main() {
 	ur := repository.NewUserRepository(db)
 	uu := usecase.NewUserUsecase(ur)
 	uc := controller.NewUserController(uu)
-	router.Init(e, uc)
+	su := usecase.NewSessionUsecase(ur)
+	sc := controller.NewSessionController(su)
+	router.Init(e, uc, sc)
 	port, _ := strconv.Atoi(os.Args[1])
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", port)))
 }
