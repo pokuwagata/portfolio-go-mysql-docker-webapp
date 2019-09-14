@@ -39,3 +39,7 @@ func (uc *UserController) Create(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, "success")
 }
+
+func (uc *UserController) Delete(c echo.Context) error {
+	return c.JSON(http.StatusOK, "success")
+}

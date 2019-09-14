@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"api/external/jwtauth"
 	"api/model"
 	"api/repository"
 	"context"
@@ -14,9 +15,6 @@ type SessionUsecase struct {
 	ur *repository.UserRepository
 }
 
-// 64 random hexadecimal characters (0-9 and A-F):
-// https://www.grc.com/passwords.htm
-const SECRET_KEY = "D01287268E2B030F0AE20D718F1EE60CA88FCDEC3D7F9E8368DF2209E90DC4E0"
 
 func NewSessionUsecase(ur *repository.UserRepository) *SessionUsecase {
 	return &SessionUsecase{ur}
@@ -32,17 +30,19 @@ func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (
 		return "", errors.New("password is incorecct")
 	}
 
-	// Create token
-	token := jwt.New(jwt.SigningMethodHS256)
+	claims := &jwtauth.JwtCustomClaims{
+			Name : s.Username,
+			Password: hash,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			},
+		}
 
-	// Set claims
-	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = s.Username
-	claims["password"] = hash
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	// Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte(SECRET_KEY))
+	t, err := token.SignedString([]byte(jwtauth.SECRET_KEY))
 	if err != nil {
 		return "", err
 	}

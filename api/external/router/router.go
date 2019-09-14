@@ -2,6 +2,7 @@ package router
 
 import (
 	"api/controller"
+	"api/external/jwtauth"
 	"net/http"
 	"github.com/labstack/echo"
 )
@@ -12,4 +13,7 @@ func Init(e *echo.Echo, uc *controller.UserController, sc *controller.SessionCon
 	})
 	e.POST("/user", uc.Create)
 	e.POST("/session", sc.Create)
+	a := e.Group("/admin")
+	jwtauth.Init(a)
+	a.DELETE("/user", uc.Delete)
 }
