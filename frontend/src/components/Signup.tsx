@@ -21,7 +21,14 @@ export const Signup = (props: SignupProps) => {
     if (!(validateUsername() && validatePassword())) return;
 
     // TODO: APIパス設定
-    fetch('/api').then(
+    fetch('/api/user', {
+      method : 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({
+        username: username,
+        password: password
+      })
+    }).then(
       res => {
         // TODO: 後で消す
         console.log(res);

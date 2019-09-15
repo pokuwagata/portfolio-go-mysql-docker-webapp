@@ -1,7 +1,5 @@
 FROM golang:1.12
 
-RUN sudo apt-get install git
-
 WORKDIR /go/src/server
 
 COPY go.mod .
