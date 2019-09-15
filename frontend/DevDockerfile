@@ -1,0 +1,18 @@
+FROM node:8.11 as dev
+
+ADD package.json /tmp/package.json
+RUN cd /tmp && npm install
+RUN mkdir /frontend && cp -a /tmp/node_modules /frontend
+
+WORKDIR /frontend
+COPY package*.json ./
+RUN npm install
+COPY . .
+# CMD ["npm", "run", "start"]
+CMD /bin/bash
+
+FROM dev as build
+RUN npm run build
+
+FROM nginx:1.14-alpine as nginx
+# COPY --from=build /frontend/dist /usr/share/nginx/html/

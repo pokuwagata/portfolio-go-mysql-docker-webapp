@@ -13,9 +13,6 @@ services:
     ports:
       - "5000:5000"
     volumes: 
-      # - ./api/logs:/go/src/server/logs
-      # - ./api/go.mod:/go/src/server/go.mod
-      # - ./api/go.sum:/go/src/server/go.sum
       - ./api:/go/src/server
     tty: true
     depends_on:
@@ -42,8 +39,10 @@ services:
   
   frontend:
     build:
+      dockerfile: DevDockerfile
       context: ./frontend
       target: dev
+    tty: true
     ports:
       - "8080:8080"
     volumes:
