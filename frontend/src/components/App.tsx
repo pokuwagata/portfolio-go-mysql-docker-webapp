@@ -41,7 +41,17 @@ export const App = (props: AppProps) => {
               />
             )}
           />
-          <Route path="/login" component={Login} />
+          <Route
+            path="/login"
+            render={props => (
+              <Login
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+                setFlushState={setFlushState}
+                {...props}
+              />
+            )}
+          />
         </Switch>
       </div>
     </div>
