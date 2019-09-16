@@ -60,6 +60,7 @@ export const UserForm = (props: UserFormProps) => {
             type: FlushType.SUCCESS,
             message: props.formDetail.successMsg,
           });
+          localStorage.setItem('portfolio-jwt-token', (res as any).json.token);
           props.setIsLoggedIn(true);
         } else {
           throw new Error((res as any).json.message)

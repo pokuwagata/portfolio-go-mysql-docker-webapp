@@ -16,12 +16,46 @@ export type FlushState = {
   message: string;
 };
 
+type getSessionResponse = {
+  ok: boolean;
+  loginUsername: string;
+}
+
 export const App = (props: AppProps) => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [flushState, setFlushState] = React.useState({
     isDisplay: false,
     type: undefined,
     message: '',
+  });
+  const [loginUsername, setLoginUsername] = React.useState();
+
+  React.useEffect(()=>{
+    const token = localStorage.getItem('portfolio-jwt-token');
+    if(!token) {
+      setIsLoggedIn(false);
+      setLoginUsername('');
+    } else {
+      fetch('api/session', {
+        method : 'GET',
+        headers: {'Authorization: Bearer': token}
+      }).then(res => {
+        return new Promise((resolve) => res.json().then((json) => resolve({
+          ok: res.ok,
+          json
+        })));
+      }).then(res => {
+        if((res as getSessionResponse).ok) {
+          setIsLoggedIn(true);
+          setLoginUsername((res as getSessionResponse).loginUsername);
+        } else {
+          throw new Error();
+        }
+      }).catch(() => {
+        setIsLoggedIn(false);
+        setLoginUsername('');
+      });
+    }
   });
 
   return (
