@@ -33,7 +33,9 @@ export const UserForm = (props: UserFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 少なくとも1つのフォームにバリデーションエラーが発生している場合は処理を中断
-    if (!(validateUsername() && validatePassword())) return;
+    const isValidUsername = validateUsername();
+    const isValidPassword = validatePassword();
+    if (!(isValidUsername && isValidPassword)) return;
 
     fetch(props.formDetail.requestUri, {
       method : 'POST',
@@ -130,7 +132,7 @@ export const UserForm = (props: UserFormProps) => {
                 'form-control' +
                 (usernameErrors.length > 0 ? ' ' + 'is-invalid' : '')
               }
-              placeholder="Username"
+              placeholder="ユーザ名を入力"
               maxLength={16}
               onChange={e => setUsername(e.target.value)}
             />
@@ -145,7 +147,7 @@ export const UserForm = (props: UserFormProps) => {
                 'form-control' +
                 (passwordErrors.length > 0 ? ' ' + 'is-invalid' : '')
               }
-              placeholder="Password"
+              placeholder="パスワードを入力"
               maxLength={32}
               onChange={e => setPassword(e.target.value)}
             />
