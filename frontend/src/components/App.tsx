@@ -6,6 +6,7 @@ import { Signup } from './Signup';
 import { Login } from './Login';
 import { ArticleList } from './ArticleList';
 import { Flush, FlushType } from './Flush';
+import { ArticlePost } from './ArticlePost';
 
 type AppProps = {};
 type AppState = {};
@@ -25,7 +26,7 @@ export const App = (props: AppProps) => {
 
   return (
     <div>
-      <Header isLoggedIn={false} />
+      <Header isLoggedIn={isLoggedIn} />
       <Flush {...flushState} setFlushState={setFlushState} />
       <div className="container">
         <Switch>
@@ -45,6 +46,17 @@ export const App = (props: AppProps) => {
             path="/login"
             render={props => (
               <Login
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+                setFlushState={setFlushState}
+                {...props}
+              />
+            )}
+          />
+          <Route
+            path="/post"
+            render={props => (
+              <ArticlePost
                 isLoggedIn={isLoggedIn}
                 setIsLoggedIn={setIsLoggedIn}
                 setFlushState={setFlushState}
