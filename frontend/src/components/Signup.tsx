@@ -8,6 +8,7 @@ export type SignupProps = RouteComponentProps & {
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
   setFlushState: (state: FlushState) => void;
+  setLoginUsername: (state: boolean) => void;
 };
 
 export const Signup = (props: SignupProps) => {

@@ -13,7 +13,9 @@ func Init(e *echo.Echo, uc *controller.UserController, sc *controller.SessionCon
 	})
 	e.POST("/user", uc.Create)
 	e.POST("/session", sc.Create)
+	// 認証・認可が必要なリクエスト
 	a := e.Group("/admin")
 	jwtauth.Init(a)
 	a.DELETE("/user", uc.Delete)
+	a.GET("/session", sc.GetUsernameFromToken)
 }

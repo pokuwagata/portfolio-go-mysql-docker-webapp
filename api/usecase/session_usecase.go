@@ -15,7 +15,6 @@ type SessionUsecase struct {
 	ur *repository.UserRepository
 }
 
-
 func NewSessionUsecase(ur *repository.UserRepository) *SessionUsecase {
 	return &SessionUsecase{ur}
 }
@@ -31,12 +30,12 @@ func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (
 	}
 
 	claims := &jwtauth.JwtCustomClaims{
-			Name : s.Username,
-			Password: hash,
-			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
-			},
-		}
+		Name:     s.Username,
+		Password: hash,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+		},
+	}
 
 	// Create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -48,4 +47,19 @@ func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (
 	}
 
 	return t, nil
+}
+
+func (su *SessionUsecase) GetUsernameFromToken(t string) (string, error) {
+	token, err := jwt.ParseWithClaims(t, &jwtauth.JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtauth.SECRET_KEY), nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	if claims, ok := token.Claims.(*jwtauth.JwtCustomClaims); ok && token.Valid {
+		return claims.Name, nil
+	} else {
+		return "", errors.New("token is invalid")
+	}
 }

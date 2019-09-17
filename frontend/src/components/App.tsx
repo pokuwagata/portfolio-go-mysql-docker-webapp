@@ -36,9 +36,9 @@ export const App = (props: AppProps) => {
       setIsLoggedIn(false);
       setLoginUsername('');
     } else {
-      fetch('api/session', {
+      fetch('api/admin/session', {
         method : 'GET',
-        headers: {'Authorization: Bearer': token}
+        headers: {Authorization: 'Bearer' + ' ' + token}
       }).then(res => {
         return new Promise((resolve) => res.json().then((json) => resolve({
           ok: res.ok,
@@ -51,12 +51,13 @@ export const App = (props: AppProps) => {
         } else {
           throw new Error();
         }
-      }).catch(() => {
+      }).catch((error) => {
+        // TODO: エラーフラッシュの設定
         setIsLoggedIn(false);
         setLoginUsername('');
       });
     }
-  });
+  }, []); // マウント時のみ実行するため[]を渡す
 
   return (
     <div>
@@ -72,6 +73,7 @@ export const App = (props: AppProps) => {
                 isLoggedIn={isLoggedIn}
                 setIsLoggedIn={setIsLoggedIn}
                 setFlushState={setFlushState}
+                setLoginUsername={setLoginUsername}
                 {...props}
               />
             )}
@@ -83,6 +85,7 @@ export const App = (props: AppProps) => {
                 isLoggedIn={isLoggedIn}
                 setIsLoggedIn={setIsLoggedIn}
                 setFlushState={setFlushState}
+                setLoginUsername={setLoginUsername}
                 {...props}
               />
             )}

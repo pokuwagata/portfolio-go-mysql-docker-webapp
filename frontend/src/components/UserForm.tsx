@@ -22,6 +22,7 @@ export type UserFormProps = {
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
   setFlushState: (state: FlushState) => void;
+  setLoginUsername: (state: boolean) => void;
 };
 
 export const UserForm = (props: UserFormProps) => {
@@ -54,6 +55,7 @@ export const UserForm = (props: UserFormProps) => {
     .then(res => {
         // TODO: 後で消す
         console.log(res);
+        // TODO: as any以外の方法
         if((res as any).ok) {
           props.setFlushState({
             isDisplay: true,
@@ -62,6 +64,7 @@ export const UserForm = (props: UserFormProps) => {
           });
           localStorage.setItem('portfolio-jwt-token', (res as any).json.token);
           props.setIsLoggedIn(true);
+          props.setLoginUsername((res as any).json.username);
         } else {
           throw new Error((res as any).json.message)
         }
