@@ -14,4 +14,7 @@ func Init(e *echo.Echo) {
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Output: file,
 	}))
+	// TODO: ログレベルは検討
+	e.Logger.SetLevel(1)
+	e.Logger.SetOutput(file)
 }
