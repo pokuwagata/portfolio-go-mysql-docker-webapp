@@ -92,27 +92,27 @@ CREATE TABLE IF NOT EXISTS `sample_db`.`articles` (
   `title` VARCHAR(45) NOT NULL,
   `content` VARCHAR(1000) NOT NULL,
   `post_id` INT NOT NULL,
-  `created_at` DATETIME NOT NULL,
-  `updated_at` TIMESTAMP NOT NULL,
-  `users_id` INT NOT NULL,
-  `article_statuses_id` INT NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user_id` INT NOT NULL,
+  `article_statuse_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `post_id_idx` (`post_id` ASC),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  INDEX `fk_articles_users1_idx` (`users_id` ASC),
-  INDEX `fk_articles_article_statuses1_idx` (`article_statuses_id` ASC),
+  INDEX `fk_articles_users1_idx` (`user_id` ASC),
+  INDEX `fk_articles_article_statuses1_idx` (`article_statuse_id` ASC),
   CONSTRAINT `post_id`
     FOREIGN KEY (`post_id`)
     REFERENCES `sample_db`.`posts` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_articles_users1`
-    FOREIGN KEY (`users_id`)
+    FOREIGN KEY (`user_id`)
     REFERENCES `sample_db`.`users` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_articles_article_statuses1`
-    FOREIGN KEY (`article_statuses_id`)
+    FOREIGN KEY (`article_statuse_id`)
     REFERENCES `sample_db`.`article_statuses` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
