@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Redirect } from 'react-router-dom';
 import { FlushState } from './App';
+import { FlushType } from './Flush';
 
 export type ArticlePostProps = {
   isLoggedIn: boolean;
@@ -13,13 +14,53 @@ export const ArticlePost = (props: ArticlePostProps) => {
   const [titleErrors, setTitleErrors] = React.useState([]);
   const [content, setContent] = React.useState('');
   const [contentErrors, setContentErrors] = React.useState([]);
+  const [postDone, setPostDone] = React.useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 少なくとも1つのフォームにバリデーションエラーが発生している場合は処理を中断
     const isValidTitle =  validateTitle();
     const isValidContent = validateContent();
-    if(isValidTitle && isValidContent) return
+    if(!(isValidTitle && isValidContent)) return
+    fetch('api/admin/article', {
+      method : 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('portfolio-jwt-token')
+      },
+      body: JSON.stringify({
+        title: title,
+        content: content
+      })
+    })
+    .then(res => {
+      return new Promise((resolve) => res.json().then((json) => resolve({
+        ok: res.ok,
+        json
+      })));
+    })
+    .then(res => {
+        // TODO: as any以外の方法
+        if((res as any).ok) {
+          props.setFlushState({
+            isDisplay: true,
+            type: FlushType.SUCCESS,
+            message: '記事の投稿に成功しました',
+          });
+          setPostDone(true);
+        } else {
+          throw new Error((res as any).json.message);
+        }
+      }
+    ).catch(
+      (error)=>{
+        // TODO: 後で消す
+        props.setFlushState({
+          isDisplay: true,
+          type: FlushType.ERROR,
+          message: '記事の投稿に失敗しました。' + error
+        });
+      });
   };
 
   const validateTitle = (): boolean => {
@@ -52,7 +93,7 @@ export const ArticlePost = (props: ArticlePostProps) => {
     return errors;
   }
 
-  return props.isLoggedIn ? (
+  return props.isLoggedIn && !postDone? ( // ログイン状態かつ記事未投稿状態の場合
     <div className="justify-content-center">
       <div>
         <h1>記事の投稿</h1>
