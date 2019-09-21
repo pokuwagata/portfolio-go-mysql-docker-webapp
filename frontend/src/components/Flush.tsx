@@ -19,7 +19,7 @@ export const Flush = (props: FlushProps) => {
       case FlushType.SUCCESS:
         return 'alert-success';
       case FlushType.ERROR:
-        return 'alert-error';
+        return 'alert-danger';
       case FlushType.INFO:
         return 'alert-info';
       default:
