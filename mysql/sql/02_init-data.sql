@@ -22,4 +22,4 @@ VALUES
 INSERT INTO `sample_db`.`users`
 (`username`, `password`, `status_id`)
 VALUES
-('username', '$2a$10$xR4efFuokmGrHXeffMCNou4nBM2QoZKiu3OWo1YCWSktVXuMnIe8u', 1);
+('sample', '$2a$10$xR4efFuokmGrHXeffMCNou4nBM2QoZKiu3OWo1YCWSktVXuMnIe8u', 1);

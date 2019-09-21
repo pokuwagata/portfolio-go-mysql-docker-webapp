@@ -59,7 +59,7 @@ DROP TABLE IF EXISTS `sample_db`.`posts` ;
 CREATE TABLE IF NOT EXISTS `sample_db`.`posts` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `user_id` INT NOT NULL,
-  `posted_at` DATETIME NOT NULL,
+  `posted_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX `user_id_idx` (`user_id` ASC),
   CONSTRAINT `user_id`
@@ -95,12 +95,12 @@ CREATE TABLE IF NOT EXISTS `sample_db`.`articles` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` INT NOT NULL,
-  `article_statuse_id` INT NOT NULL,
+  `article_status_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `post_id_idx` (`post_id` ASC),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `fk_articles_users1_idx` (`user_id` ASC),
-  INDEX `fk_articles_article_statuses1_idx` (`article_statuse_id` ASC),
+  INDEX `fk_articles_article_statuses1_idx` (`article_status_id` ASC),
   CONSTRAINT `post_id`
     FOREIGN KEY (`post_id`)
     REFERENCES `sample_db`.`posts` (`id`)
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `sample_db`.`articles` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_articles_article_statuses1`
-    FOREIGN KEY (`article_statuse_id`)
+    FOREIGN KEY (`article_status_id`)
     REFERENCES `sample_db`.`article_statuses` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

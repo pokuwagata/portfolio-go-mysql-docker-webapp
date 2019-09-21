@@ -24,11 +24,15 @@ func main() {
 	validater.Init(e)
 
 	ur := repository.NewUserRepository(db)
+	ar := repository.NewArticleRepository(db)
+	pr := repository.NewPostRepository(db)
 	uu := usecase.NewUserUsecase(ur)
-	uc := controller.NewUserController(uu)
 	su := usecase.NewSessionUsecase(ur)
+	au := usecase.NewArticleUsecase(ar, ur, pr, su)
 	sc := controller.NewSessionController(su)
-	router.Init(e, uc, sc)
+	uc := controller.NewUserController(uu)
+	ac := controller.NewArticleController(au)
+	router.Init(e, uc, sc, ac)
 	port, _ := strconv.Atoi(os.Args[1])
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", port)))
 }

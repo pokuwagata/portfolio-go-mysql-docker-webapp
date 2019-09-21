@@ -7,7 +7,11 @@ import (
 	"github.com/labstack/echo"
 )
 
-func Init(e *echo.Echo, uc *controller.UserController, sc *controller.SessionController) {
+func Init(
+	e *echo.Echo,
+	uc *controller.UserController,
+	sc *controller.SessionController,
+	ac *controller.ArticleController) {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
@@ -18,4 +22,5 @@ func Init(e *echo.Echo, uc *controller.UserController, sc *controller.SessionCon
 	jwtauth.Init(a)
 	a.DELETE("/user", uc.Delete)
 	a.GET("/session", sc.GetUsernameFromToken)
+	a.POST("/article", ac.Create)
 }

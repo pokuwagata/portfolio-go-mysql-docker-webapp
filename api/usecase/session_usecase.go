@@ -20,7 +20,6 @@ func NewSessionUsecase(ur *repository.UserRepository) *SessionUsecase {
 }
 
 func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (string, error) {
-	// Check Username & Password
 	hash, err := su.ur.GetPassword(ctx, s)
 	if err != nil {
 		return "", err
@@ -37,10 +36,8 @@ func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (
 		},
 	}
 
-	// Create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Generate encoded token and send it as response.
 	t, err := token.SignedString([]byte(jwtauth.SECRET_KEY))
 	if err != nil {
 		return "", err
