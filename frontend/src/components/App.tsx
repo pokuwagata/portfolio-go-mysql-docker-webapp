@@ -7,6 +7,7 @@ import { Login } from './Login';
 import { ArticleList } from './ArticleList';
 import { Flush, FlushType } from './Flush';
 import { ArticlePost } from './ArticlePost';
+import { ArticleManagement } from './ArticleManagement';
 
 type AppProps = {};
 type AppState = {};
@@ -99,6 +100,12 @@ export const App = (props: AppProps) => {
                 setFlushState={setFlushState}
                 {...props}
               />
+            )}
+          />
+          <Route
+            path="/management"
+            render={props => (
+              <ArticleManagement></ArticleManagement>
             )}
           />
         </Switch>

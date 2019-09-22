@@ -96,7 +96,7 @@ export const ArticlePost = (props: ArticlePostProps) => {
   return props.isLoggedIn && !postDone? ( // ログイン状態かつ記事未投稿状態の場合
     <div className="justify-content-center">
       <div>
-        <h1>記事の投稿</h1>
+        <h1 className="mb-3">記事の投稿</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group row">
             <div className="col-8">

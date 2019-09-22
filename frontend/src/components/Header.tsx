@@ -6,7 +6,7 @@ export interface HeaderProps {
 }
 
 export const Header = (props: HeaderProps) => (
-  <nav className="navbar navbar-expand-lg navbar-light bg-light">
+  <nav className="navbar navbar-expand-lg navbar-light bg-light mb-3">
     <div className="navbar-collapse">
       <ul className="navbar-nav mr-auto">
         <HeaderButton name="Home" path="/" />
