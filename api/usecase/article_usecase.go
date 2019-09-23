@@ -51,3 +51,18 @@ func (au *ArticleUsecase) CreateArticle(ctx context.Context, a *model.Article, t
 
 	return nil
 }
+
+func (au *ArticleUsecase) GetByPageNumber(ctx context.Context, n int, t string) ([]model.ViewArticle, error) {
+	// tokenから投稿者を設定
+	u, err := au.su.GetUsernameFromToken(t)
+	if err != nil {
+		return nil, err
+	}
+
+	articles, err := au.ar.GetByPageNumber(ctx, u, n)
+	if err != nil {
+		return nil, err
+	}
+
+	return articles, nil;
+}

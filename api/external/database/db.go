@@ -10,7 +10,7 @@ import (
 func NewDB(e *echo.Echo) *sql.DB {
 	// TODO: configファイル化
 	db, err := sql.Open("mysql",
-		"user:password@tcp(db:3306)/sample_db")
+		"user:password@tcp(db:3306)/sample_db?parseTime=true")
 	if err != nil {
 		e.Logger.Fatal(err.Error())
 	}

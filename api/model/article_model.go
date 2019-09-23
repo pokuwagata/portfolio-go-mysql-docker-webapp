@@ -14,3 +14,10 @@ type Article struct {
 	Username string
 	ArticleStatus string
 }
+
+type ViewArticle struct {
+	ID int64
+	Title string
+	Content string
+	UpdatedAt time.Time
+}

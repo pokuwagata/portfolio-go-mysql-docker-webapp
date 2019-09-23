@@ -23,4 +23,5 @@ func Init(
 	a.DELETE("/user", uc.Delete)
 	a.GET("/session", sc.GetUsernameFromToken)
 	a.POST("/article", ac.Create)
+	a.GET("/articles", ac.GetList)
 }
