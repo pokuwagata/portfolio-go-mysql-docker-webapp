@@ -45,9 +45,13 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, un string, n i
 	}
 
 	var rows *sql.Rows
+	// NOTE: index利用のため（サブクエリを使用しないため）に直接指定
+	// idが初期データの投入順に依存するため変更時は修正が必要
+	artStaId := 1 
+
 	if n == 1 {
 		atcQuery := `SELECT id, title, content, updated_at FROM articles ` +
-			`WHERE user_id = ? AND article_status_id = (SELECT id FROM article_statuses WHERE status = ? ) ` +
+			`WHERE user_id = ? AND article_status_id = ?` +
 			`ORDER BY updated_at DESC LIMIT ?`
 
 		stmt, err = ar.db.PrepareContext(ctx, atcQuery)
@@ -55,17 +59,22 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, un string, n i
 			return nil, err
 		}
 
-		rows, err = stmt.QueryContext(ctx, uid, constant.PUBLISHED, constant.ARTICLES_PER_PAGE)
+		rows, err = stmt.QueryContext(ctx, uid, artStaId, constant.ARTICLES_PER_PAGE)
 		if err != nil {
 			return nil, err
 		}
 
 	} else {
-		// updated_atが同一のレコードが存在しない想定
-		atcQuery := `SELECT id, title, content, updated_at FROM articles WHERE updated_at < ` +
-			`(SELECT updated_at FROM articles WHERE user_id = ? AND article_status_id = (SELECT id FROM article_statuses WHERE status = ? ) ` +
-			`ORDER BY updated_at DESC LIMIT 1 OFFSET ?) ` +
-			`AND user_id = ? AND article_status_id = (SELECT id FROM article_statuses WHERE status = ? ) ` + 
+		// updated_atが同一のレコードは存在しない想定
+		// paging indexを利用(user_id, article_status_id, updated_at DESC)
+		atcQuery :=
+		 `SELECT id, title, content, updated_at FROM articles WHERE ` + 
+				`user_id = ? ` + 
+				`AND article_status_id = ? ` +
+				`AND updated_at < ` +
+					`(SELECT updated_at FROM articles WHERE 
+						user_id = ? AND article_status_id = ? ` +
+					`ORDER BY updated_at DESC LIMIT 1 OFFSET ?) ` +
 			`ORDER BY updated_at DESC LIMIT ?`
 
 		stmt, err = ar.db.PrepareContext(ctx, atcQuery)
@@ -75,7 +84,7 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, un string, n i
 
 		offset := constant.ARTICLES_PER_PAGE*(n-1) - 1
 
-		rows, err = stmt.QueryContext(ctx, uid, constant.PUBLISHED, offset, uid, constant.PUBLISHED, constant.ARTICLES_PER_PAGE)
+		rows, err = stmt.QueryContext(ctx, uid, artStaId, uid, artStaId, offset, constant.ARTICLES_PER_PAGE)
 		if err != nil {
 			return nil, err
 		}

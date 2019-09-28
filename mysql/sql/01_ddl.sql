@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS `sample_db`.`articles` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `fk_articles_users1_idx` (`user_id` ASC),
   INDEX `fk_articles_article_statuses1_idx` (`article_status_id` ASC),
+  INDEX `paging` (`user_id` ASC, `article_status_id` ASC, `updated_at` DESC),
   CONSTRAINT `post_id`
     FOREIGN KEY (`post_id`)
     REFERENCES `sample_db`.`posts` (`id`)
