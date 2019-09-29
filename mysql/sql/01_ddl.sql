@@ -47,8 +47,7 @@ CREATE TABLE IF NOT EXISTS `sample_db`.`users` (
     REFERENCES `sample_db`.`user_statuses` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------

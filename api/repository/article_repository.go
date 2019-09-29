@@ -51,7 +51,7 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, un string, n i
 
 	if n == 1 {
 		atcQuery := `SELECT id, title, content, updated_at FROM articles ` +
-			`WHERE user_id = ? AND article_status_id = ?` +
+			`WHERE user_id = ? AND article_status_id = ? ` +
 			`ORDER BY updated_at DESC LIMIT ?`
 
 		stmt, err = ar.db.PrepareContext(ctx, atcQuery)
