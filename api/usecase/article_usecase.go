@@ -52,14 +52,34 @@ func (au *ArticleUsecase) CreateArticle(ctx context.Context, a *model.Article, t
 	return nil
 }
 
+func (au *ArticleUsecase) GetMaxPageNumber(ctx context.Context, t string) (int, error) {
+	// tokenから投稿者を設定
+	un, err := au.su.GetUsernameFromToken(t)
+	if err != nil {
+		return 0, err
+	}
+
+	cnt, err := au.ar.GetArticleCount(ctx, un)
+	if err != nil {
+		return 0, err
+	}
+
+	max := cnt / constant.ARTICLES_PER_PAGE
+	if cnt % constant.ARTICLES_PER_PAGE != 0 {
+		max+=1
+	}
+
+	return max, nil;
+}
+
 func (au *ArticleUsecase) GetByPageNumber(ctx context.Context, n int, t string) ([]model.ViewArticle, error) {
 	// tokenから投稿者を設定
-	u, err := au.su.GetUsernameFromToken(t)
+	un, err := au.su.GetUsernameFromToken(t)
 	if err != nil {
 		return nil, err
 	}
 
-	articles, err := au.ar.GetByPageNumber(ctx, u, n)
+	articles, err := au.ar.GetByPageNumber(ctx, un, n)
 	if err != nil {
 		return nil, err
 	}
