@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 export interface ArticleManagementRowProps {
-  id :string
-  title :string
-  updatedAt :string
+  id: string;
+  title: string;
+  updatedAt: string;
 }
 
 export const ArticleManagementRow = (props: ArticleManagementRowProps) => {
@@ -21,7 +21,7 @@ export const ArticleManagementRow = (props: ArticleManagementRowProps) => {
           {props.title}
         </label>
       </div>
-      <div className="sm-col-2">{props.updatedAt}</div>
+      <div className="sm-col-auto">{new Date(props.updatedAt).toString()}</div>
       <div className="ml-md-auto">
         <button type="button" className="btn btn-primary">
           編集

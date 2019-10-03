@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FlushState } from './App';
 
 export enum FlushType {
   SUCCESS,
@@ -8,9 +9,9 @@ export enum FlushType {
 
 export type FlushProps = {
   isDisplay: boolean;
-  type: FlushType;
-  message: string;
-  setFlushState: any;
+  type?: FlushType;
+  message?: string;
+  setFlushState: (state: FlushState) => void;
 };
 
 export const Flush = (props: FlushProps) => {
@@ -28,7 +29,7 @@ export const Flush = (props: FlushProps) => {
   };
 
   if (props.isDisplay) {
-    setTimeout(() => props.setFlushState({ isDisplay: false }), 1500);
+    setTimeout(() => props.setFlushState({ isDisplay: false }), 100000);
   }
 
   return (

@@ -13,50 +13,57 @@ type AppProps = {};
 type AppState = {};
 export type FlushState = {
   isDisplay: boolean;
-  type: FlushType;
-  message: string;
+  type?: FlushType;
+  message?: string;
 };
 
 type getSessionResponse = {
   ok: boolean;
   loginUsername: string;
-}
+};
 
 export const App = (props: AppProps) => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [flushState, setFlushState] = React.useState({
+  const [flushState, setFlushState] = React.useState<FlushState>({
     isDisplay: false,
     type: undefined,
     message: '',
   });
   const [loginUsername, setLoginUsername] = React.useState();
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     const token = localStorage.getItem('portfolio-jwt-token');
-    if(!token) {
+    if (!token) {
       setIsLoggedIn(false);
       setLoginUsername('');
     } else {
       fetch('api/admin/session', {
-        method : 'GET',
-        headers: {Authorization: 'Bearer' + ' ' + token}
-      }).then(res => {
-        return new Promise((resolve) => res.json().then((json) => resolve({
-          ok: res.ok,
-          json
-        })));
-      }).then(res => {
-        if((res as getSessionResponse).ok) {
-          setIsLoggedIn(true);
-          setLoginUsername((res as getSessionResponse).loginUsername);
-        } else {
-          throw new Error();
-        }
-      }).catch((error) => {
-        // TODO: エラーフラッシュの設定
-        setIsLoggedIn(false);
-        setLoginUsername('');
-      });
+        method: 'GET',
+        headers: { Authorization: 'Bearer' + ' ' + token },
+      })
+        .then(res => {
+          return new Promise(resolve =>
+            res.json().then(json =>
+              resolve({
+                ok: res.ok,
+                json,
+              })
+            )
+          );
+        })
+        .then(res => {
+          if ((res as getSessionResponse).ok) {
+            setIsLoggedIn(true);
+            setLoginUsername((res as getSessionResponse).loginUsername);
+          } else {
+            throw new Error();
+          }
+        })
+        .catch(error => {
+          // TODO: エラーフラッシュの設定
+          setIsLoggedIn(false);
+          setLoginUsername('');
+        });
     }
   }, []); // マウント時のみ実行するため[]を渡す
 
@@ -70,7 +77,7 @@ export const App = (props: AppProps) => {
           <Route
             path="/signup"
             render={props => (
-              <Signup
+              <Signup // TODO: 各コンポーネントのprops共通化
                 isLoggedIn={isLoggedIn}
                 setIsLoggedIn={setIsLoggedIn}
                 setFlushState={setFlushState}
@@ -105,7 +112,12 @@ export const App = (props: AppProps) => {
           <Route
             path="/management"
             render={props => (
-              <ArticleManagement></ArticleManagement>
+              <ArticleManagement
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+                setFlushState={setFlushState}
+                {...props} // TODO: 不要な場合は削除する
+              />
             )}
           />
         </Switch>
