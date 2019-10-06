@@ -124,3 +124,25 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, un string, n i
 
 	return articles, nil
 }
+
+func (ar *ArticleRepository) Delete(ctx context.Context, aId int64, un string) (int64, error) {
+	query:= `UPDATE articles SET article_status_id = (SELECT id FROM article_statuses WHERE status = ?) ` +
+		`WHERE id = ? AND user_id = (SELECT id FROM users WHERE username = ?)`
+
+	stmt, err := ar.db.PrepareContext(ctx, query)
+	if err != nil {
+		return 0, err
+	}
+
+	res, err := stmt.ExecContext(ctx, constant.REMOVED, aId, un)
+	if err != nil {
+		return 0, err
+	}
+
+	lastId, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return lastId, nil
+}

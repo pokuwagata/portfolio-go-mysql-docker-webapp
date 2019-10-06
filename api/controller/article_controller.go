@@ -42,6 +42,7 @@ func (ac *ArticleController) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, "success")
 }
 
+// TODO: GetListByUserの方が適切
 func (ac *ArticleController) GetList(c echo.Context) error {
 	n, _ := strconv.Atoi(c.QueryParam("number"))
 	if n > 1 {
@@ -64,6 +65,7 @@ func (ac *ArticleController) GetList(c echo.Context) error {
 
 		return c.JSON(http.StatusOK, model.FirstGetListResponse{Articles: articles, Max: max})
 	} else if n == 0 {
+		// TODO: おそらく不要のため削除（n=0ならエラー）
 		return ac.getAll(c)
 	} else {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: "リクエストパラメータが不正です"})
@@ -104,4 +106,24 @@ func (ac *ArticleController) getMaxPageNumber(c echo.Context) (int, error) {
 	}
 
 	return max, nil
+}
+
+func (ac *ArticleController) Delete(c echo.Context) error {
+	id, err := strconv.ParseInt(c.QueryParam("id"), 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	token := GetTokenFromHeader(c)
+	_, err = ac.au.Delete(ctx, id, token)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusCreated, "success")
 }

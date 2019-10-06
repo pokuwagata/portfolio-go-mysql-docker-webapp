@@ -84,5 +84,19 @@ func (au *ArticleUsecase) GetByPageNumber(ctx context.Context, n int, t string) 
 		return nil, err
 	}
 
-	return articles, nil;
+	return articles, nil
+}
+
+func (au *ArticleUsecase) Delete(ctx context.Context, articleId int64, token string) (int64, error) {
+	name, err := au.su.GetUsernameFromToken(token)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := au.ar.Delete(ctx, articleId, name)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
