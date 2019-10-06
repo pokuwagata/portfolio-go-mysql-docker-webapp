@@ -19,22 +19,6 @@ enum MoveType {
   Next,
 }
 
-// const determineMode = (pages: number[], max: number) => {
-
-//   if (max <= 3) {
-//     return Mode.None;
-//   }
-
-//   if (Math.min(...pages) === 1) {
-//     return Mode.Left;
-//   }
-
-//   if (Math.max(...pages) === max) {
-//     return Mode.Right;
-//   }
-
-//   return Mode.Center;
-// };
 const determineMode = (now: number, max: number) => {
   if (max === 1) {
     return Mode.None;
@@ -52,6 +36,7 @@ const determineMode = (now: number, max: number) => {
 const getPages = (now: number, max: number) => {
   let pages;
   if (now === 1) {
+    // TODO: 畳み込みに書き換え
     pages = [now, now + 1, now + 2];
   } else if (now === max) {
     pages = [now - 2, now - 1, now];
