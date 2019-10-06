@@ -5,6 +5,7 @@ export interface PaginationProps {
   setPageNumber: (pageNumber: number) => void;
   maxPageNumber: number;
   setMaxPageNumber: (maxPageNumber: number) => void;
+  loading: boolean;
 }
 
 enum Mode {
@@ -70,56 +71,58 @@ export const Pagination = (props: PaginationProps) => {
 
   return (
     <div className="d-flex justify-content-center">
-      <nav aria-label="Page navigation example">
-        <ul className="pagination">
-          {mode !== Mode.Left && mode !== Mode.None && (
-            <li className="page-item">
-              <a
-                className="page-link"
-                href="#"
-                aria-label="Previous"
-                onClick={(event: React.MouseEvent) =>
-                  onClickMove(event, MoveType.Previous)
+      {props.loading ? null : (
+        <nav aria-label="Page navigation example">
+          <ul className="pagination">
+            {mode !== Mode.Left && mode !== Mode.None && (
+              <li className="page-item">
+                <a
+                  className="page-link"
+                  href="#"
+                  aria-label="Previous"
+                  onClick={(event: React.MouseEvent) =>
+                    onClickMove(event, MoveType.Previous)
+                  }
+                >
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+            )}
+            {pages.map(number => (
+              <li
+                className={
+                  'page-item' + (number === props.pageNumber && ' ' + 'active')
                 }
+                key={number}
               >
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-          )}
-          {pages.map(number => (
-            <li
-              className={
-                'page-item' + (number === props.pageNumber && ' ' + 'active')
-              }
-              key={number}
-            >
-              <a
-                className="page-link"
-                href="#"
-                onClick={(event: React.MouseEvent) =>
-                  onClickNumber(event, number)
-                }
-              >
-                {number}
-              </a>
-            </li>
-          ))}
-          {mode !== Mode.Right && mode !== Mode.None && (
-            <li className="page-item">
-              <a
-                className="page-link"
-                href="#"
-                aria-label="Next"
-                onClick={(event: React.MouseEvent) =>
-                  onClickMove(event, MoveType.Next)
-                }
-              >
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          )}
-        </ul>
-      </nav>
+                <a
+                  className="page-link"
+                  href="#"
+                  onClick={(event: React.MouseEvent) =>
+                    onClickNumber(event, number)
+                  }
+                >
+                  {number}
+                </a>
+              </li>
+            ))}
+            {mode !== Mode.Right && mode !== Mode.None && (
+              <li className="page-item">
+                <a
+                  className="page-link"
+                  href="#"
+                  aria-label="Next"
+                  onClick={(event: React.MouseEvent) =>
+                    onClickMove(event, MoveType.Next)
+                  }
+                >
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            )}
+          </ul>
+        </nav>
+      )}
     </div>
   );
 };

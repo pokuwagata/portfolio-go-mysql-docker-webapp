@@ -28,12 +28,12 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
             'Bearer ' + localStorage.getItem('portfolio-jwt-token'),
         },
       });
-      setLoading(false);
       const json = await res.json();
       if (res.ok) {
         props.setFlushState({ isDisplay: false });
         setArticleList(json.articles);
         json.maxNumber && setMaxNumber(json.maxNumber);
+        setLoading(false);
       } else {
         throw new Error(json.message);
       }
@@ -44,6 +44,7 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
         message: '記事の取得に失敗しました。' + error,
       });
       setArticleList([]);
+      setLoading(false);
     }
   };
 
@@ -88,6 +89,7 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
         setPageNumber={setPageNumber}
         maxPageNumber={maxPageNumber}
         setMaxPageNumber={setPageNumber}
+        loading={loading}
       />
     </div>
   );
