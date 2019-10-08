@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Redirect } from 'react-router-dom';
-import { FlushState } from './App';
 import { FlushType } from './Flush';
 import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 

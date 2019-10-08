@@ -5,11 +5,10 @@ import { Header } from './Header';
 import { Signup } from './Signup';
 import { Login } from './Login';
 import { ArticleList } from './ArticleList';
-import { Flush, FlushType } from './Flush';
+import { FlushType } from './Flush';
 import { ArticlePost } from './ArticlePost';
 import { ArticleManagement } from './ArticleManagement';
 import { FlushProvider } from './FlushProvider';
-import { Hoge } from './Hoge';
 
 type AppProps = {};
 type AppState = {};

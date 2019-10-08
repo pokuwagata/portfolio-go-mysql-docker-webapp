@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { ArticleManagementRow } from './ArticleManagementRow';
-import { FlushState } from './App';
 import { FlushType } from './Flush';
 import { Pagination } from './Pagination';
 import { ArticleRemoveButton } from './ArticleRemoveButton';
