@@ -7,7 +7,6 @@ import { UserForm, FormType } from './UserForm';
 export type LoginProps = RouteComponentProps & {
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
-  setFlushState: (state: FlushState) => void;
   setLoginUsername: (state: boolean) => void;
 };
 

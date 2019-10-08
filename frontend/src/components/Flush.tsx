@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FlushState } from './App';
+import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 
 export enum FlushType {
   SUCCESS,
@@ -11,10 +11,13 @@ export type FlushProps = {
   isDisplay: boolean;
   type?: FlushType;
   message?: string;
-  setFlushState: (state: FlushState) => void;
 };
 
+const FLUSH_HIDDEN_TIME = 3000;
+
 export const Flush = (props: FlushProps) => {
+  const flushDispatch = React.useContext(FlushDispatchContext);
+
   const convertFlushTypeToClassName = function(type: FlushType) {
     switch (type) {
       case FlushType.SUCCESS:
@@ -28,8 +31,11 @@ export const Flush = (props: FlushProps) => {
     }
   };
 
-  if (props.isDisplay) {
-    setTimeout(() => props.setFlushState({ isDisplay: false }), 100000);
+  if (props.isDisplay && props.type === FlushType.SUCCESS) {
+    setTimeout(
+      () => flushDispatch({ type: FlushActionType.FORCE_HIDDEN }),
+      FLUSH_HIDDEN_TIME
+    );
   }
 
   return (

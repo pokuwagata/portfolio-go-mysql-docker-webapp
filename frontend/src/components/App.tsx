@@ -8,6 +8,8 @@ import { ArticleList } from './ArticleList';
 import { Flush, FlushType } from './Flush';
 import { ArticlePost } from './ArticlePost';
 import { ArticleManagement } from './ArticleManagement';
+import { FlushProvider } from './FlushProvider';
+import { Hoge } from './Hoge';
 
 type AppProps = {};
 type AppState = {};
@@ -70,58 +72,55 @@ export const App = (props: AppProps) => {
   return (
     <div>
       <Header isLoggedIn={isLoggedIn} />
-      <Flush {...flushState} setFlushState={setFlushState} />
-      <div className="container">
-        <Switch>
-          <Route exact path="/" component={ArticleList} />
-          <Route
-            path="/signup"
-            render={props => (
-              <Signup // TODO: 各コンポーネントのprops共通化
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-                setFlushState={setFlushState}
-                setLoginUsername={setLoginUsername}
-                {...props}
-              />
-            )}
-          />
-          <Route
-            path="/login"
-            render={props => (
-              <Login
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-                setFlushState={setFlushState}
-                setLoginUsername={setLoginUsername}
-                {...props}
-              />
-            )}
-          />
-          <Route
-            path="/post"
-            render={props => (
-              <ArticlePost
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-                setFlushState={setFlushState}
-                {...props}
-              />
-            )}
-          />
-          <Route
-            path="/management"
-            render={props => (
-              <ArticleManagement
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-                setFlushState={setFlushState}
-                {...props} // TODO: 不要な場合は削除する
-              />
-            )}
-          />
-        </Switch>
-      </div>
+      <FlushProvider>
+        <div className="container">
+          <Switch>
+            <Route exact path="/" component={ArticleList} />
+            <Route
+              path="/signup"
+              render={props => (
+                <Signup // TODO: 各コンポーネントのprops共通化
+                  isLoggedIn={isLoggedIn}
+                  setIsLoggedIn={setIsLoggedIn}
+                  setLoginUsername={setLoginUsername}
+                  {...props}
+                />
+              )}
+            />
+            <Route
+              path="/login"
+              render={props => (
+                <Login
+                  isLoggedIn={isLoggedIn}
+                  setIsLoggedIn={setIsLoggedIn}
+                  setLoginUsername={setLoginUsername}
+                  {...props}
+                />
+              )}
+            />
+            <Route
+              path="/post"
+              render={props => (
+                <ArticlePost
+                  isLoggedIn={isLoggedIn}
+                  setIsLoggedIn={setIsLoggedIn}
+                  {...props}
+                />
+              )}
+            />
+            <Route
+              path="/management"
+              render={props => (
+                <ArticleManagement
+                  isLoggedIn={isLoggedIn}
+                  setIsLoggedIn={setIsLoggedIn}
+                  {...props} // TODO: 不要な場合は削除する
+                />
+              )}
+            />
+          </Switch>
+        </div>
+      </FlushProvider>
     </div>
   );
 };

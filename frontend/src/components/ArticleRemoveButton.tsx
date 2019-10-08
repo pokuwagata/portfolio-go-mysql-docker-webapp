@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { FlushState } from './App';
 import { FlushType } from './Flush';
+import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 
 export interface ArticleRemoveButtonProps {
-  setFlushState: (state: FlushState) => void;
   fetchArticles: (pageNumber: number) => void;
   id: number;
 }
 
 export const ArticleRemoveButton = (props: ArticleRemoveButtonProps) => {
+  const flushDispath = React.useContext(FlushDispatchContext);
+
   const onClickButton = async (event: React.MouseEvent, id: number) => {
     event.preventDefault();
     try {
@@ -21,20 +22,24 @@ export const ArticleRemoveButton = (props: ArticleRemoveButtonProps) => {
       });
       const json = await res.json();
       if (res.ok) {
-        props.setFlushState({
-          isDisplay: true,
-          type: FlushType.SUCCESS,
-          message: '記事の削除に成功しました。',
+        flushDispath({
+          type: FlushActionType.VISIBLE,
+          payload: {
+            type: FlushType.SUCCESS,
+            message: '記事の削除に成功しました。',
+          },
         });
         props.fetchArticles(1);
       } else {
         throw new Error(json.message);
       }
     } catch (error) {
-      props.setFlushState({
-        isDisplay: true,
-        type: FlushType.ERROR,
-        message: '記事の削除に失敗しました。' + error,
+      flushDispath({
+        type: FlushActionType.VISIBLE,
+        payload: {
+          type: FlushType.ERROR,
+          message: '記事の削除に失敗しました。' + error,
+        },
       });
     }
   };

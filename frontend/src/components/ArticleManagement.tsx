@@ -4,11 +4,11 @@ import { FlushState } from './App';
 import { FlushType } from './Flush';
 import { Pagination } from './Pagination';
 import { ArticleRemoveButton } from './ArticleRemoveButton';
+import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 
 export interface ArticleManagementProps {
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
-  setFlushState: (state: FlushState) => void;
 }
 
 export const ArticleManagement = (props: ArticleManagementProps) => {
@@ -17,6 +17,8 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
   const [pageNumber, setPageNumber] = React.useState(1);
   const [maxPageNumber, setMaxNumber] = React.useState(10);
   const [selected, setSelected] = React.useState(null);
+
+  const flushDispath = React.useContext(FlushDispatchContext);
 
   const fetchArticles = async (pageNumber: number) => {
     try {
@@ -30,7 +32,9 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
       });
       const json = await res.json();
       if (res.ok) {
-        props.setFlushState({ isDisplay: false });
+        flushDispath({
+          type: FlushActionType.HIDDEN,
+        });
         setArticleList(json.articles);
         json.maxNumber && setMaxNumber(json.maxNumber);
         setLoading(false);
@@ -38,10 +42,12 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
         throw new Error(json.message);
       }
     } catch (error) {
-      props.setFlushState({
-        isDisplay: true,
-        type: FlushType.ERROR,
-        message: '記事の取得に失敗しました。' + error,
+      flushDispath({
+        type: FlushActionType.VISIBLE,
+        payload: {
+          type: FlushType.ERROR,
+          message: '記事の取得に失敗しました。' + error,
+        },
       });
       setArticleList([]);
       setLoading(false);
@@ -58,11 +64,7 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
       <div className="container mb-5">
         <div className="row">
           <div className="ml-md-auto">
-            <ArticleRemoveButton
-              setFlushState={props.setFlushState}
-              fetchArticles={fetchArticles}
-              id={selected}
-            />
+            <ArticleRemoveButton fetchArticles={fetchArticles} id={selected} />
           </div>
         </div>
       </div>

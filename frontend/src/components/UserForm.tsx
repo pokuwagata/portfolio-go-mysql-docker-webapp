@@ -2,26 +2,27 @@ import * as React from 'react';
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 import { FlushType } from './Flush';
 import { FlushState } from './App';
+import { FlushActionType, FlushDispatchContext } from './FlushProvider';
 
 export enum FormType {
   SIGNUP,
-  LOGIN
+  LOGIN,
 }
 
 export type FormDetail = {
-  formType : FormType;
-  requestUri : string;
-  successMsg : string;
+  formType: FormType;
+  requestUri: string;
+  successMsg: string;
   errorMsg: string;
-  titleText : string;
-  buttonText : string;
-}
+  titleText: string;
+  buttonText: string;
+};
 
 export type UserFormProps = {
   formDetail: FormDetail;
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
-  setFlushState: (state: FlushState) => void;
+  // setFlushState: (state: FlushState) => void;
   setLoginUsername: (state: boolean) => void;
 };
 
@@ -31,6 +32,8 @@ export const UserForm = (props: UserFormProps) => {
   const [password, setPassword] = React.useState('');
   const [passwordErrors, setPasswordErrors] = React.useState([]);
 
+  const flushDispath = React.useContext(FlushDispatchContext);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 少なくとも1つのフォームにバリデーションエラーが発生している場合は処理を中断
@@ -39,44 +42,48 @@ export const UserForm = (props: UserFormProps) => {
     if (!(isValidUsername && isValidPassword)) return;
 
     fetch(props.formDetail.requestUri, {
-      method : 'POST',
-      headers: {'content-type': 'application/json'},
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         username: username,
-        password: password
+        password: password,
+      }),
+    })
+      .then(res => {
+        return new Promise(resolve =>
+          res.json().then(json =>
+            resolve({
+              ok: res.ok,
+              json,
+            })
+          )
+        );
       })
-    })
-    .then(res => {
-      return new Promise((resolve) => res.json().then((json) => resolve({
-        ok: res.ok,
-        json
-      })));
-    })
-    .then(res => {
-        // TODO: 後で消す
-        console.log(res);
+      .then(res => {
         // TODO: as any以外の方法
-        if((res as any).ok) {
-          props.setFlushState({
-            isDisplay: true,
-            type: FlushType.SUCCESS,
-            message: props.formDetail.successMsg,
+        if ((res as any).ok) {
+          flushDispath({
+            type: FlushActionType.VISIBLE,
+            payload: {
+              type: FlushType.SUCCESS,
+              message: props.formDetail.successMsg,
+            },
           });
           localStorage.setItem('portfolio-jwt-token', (res as any).json.token);
           props.setIsLoggedIn(true);
           props.setLoginUsername((res as any).json.username);
         } else {
-          throw new Error((res as any).json.message)
+          throw new Error((res as any).json.message);
         }
-      }
-    ).catch(
-      (error)=>{
-        // TODO: 後で消す
-        props.setFlushState({
-          isDisplay: true,
-          type: FlushType.ERROR,
-          message: props.formDetail.errorMsg
-        });
+      })
+      .catch(error => {
+          flushDispath({
+            type: FlushActionType.VISIBLE,
+            payload: {
+              type: FlushType.ERROR,
+              message: props.formDetail.errorMsg,
+            },
+          });
       });
   };
 
@@ -168,4 +175,4 @@ export const UserForm = (props: UserFormProps) => {
       </div>
     </div>
   );
-}
+};
