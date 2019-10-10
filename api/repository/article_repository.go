@@ -17,7 +17,7 @@ func NewArticleRepository(db *sql.DB) *ArticleRepository {
 }
 
 func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error {
-	query := `INSERT articles SET title=?, content=?, post_id=?, ` +
+	query := `INSERT articles SET title=?, content=?, ` +
 		`user_id=(SELECT id FROM users where username=?), ` +
 		`article_status_id=(SELECT id FROM article_statuses where status= ?)`
 	stmt, err := ar.db.PrepareContext(ctx, query)
@@ -25,12 +25,28 @@ func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error 
 		return err
 	}
 
-	_, err = stmt.ExecContext(ctx, a.Title, a.Content, a.PostId, a.Username, a.ArticleStatus)
+	_, err = stmt.ExecContext(ctx, a.Title, a.Content, a.Username, a.ArticleStatus)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.ViewArticle, error) {
+	query := `select id, title, content, updated_at from articles where ID = ? and article_status_id = ?`
+
+	stmt, err := ar.db.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	var a model.ViewArticle
+	if err := stmt.QueryRowContext(ctx, id, 1).Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt); err != nil {
+		return nil, err
+	}
+
+	return &a, nil
 }
 
 func (ar *ArticleRepository) GetArticleCount(ctx context.Context, un string) (int, error) {
@@ -126,7 +142,7 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, un string, n i
 }
 
 func (ar *ArticleRepository) Delete(ctx context.Context, aId int64, un string) (int64, error) {
-	query:= `UPDATE articles SET article_status_id = (SELECT id FROM article_statuses WHERE status = ?) ` +
+	query := `UPDATE articles SET article_status_id = (SELECT id FROM article_statuses WHERE status = ?) ` +
 		`WHERE id = ? AND user_id = (SELECT id FROM users WHERE username = ?)`
 
 	stmt, err := ar.db.PrepareContext(ctx, query)

@@ -10,33 +10,23 @@ import (
 type ArticleUsecase struct {
 	ar *repository.ArticleRepository
 	ur *repository.UserRepository
-	pr *repository.PostRepository
 	su *SessionUsecase
 }
 
 func NewArticleUsecase(
 	ar *repository.ArticleRepository,
 	ur *repository.UserRepository,
-	pr *repository.PostRepository,
 	su *SessionUsecase) *ArticleUsecase {
-	return &ArticleUsecase{ar, ur, pr, su}
+	return &ArticleUsecase{ar, ur, su}
 }
 
+// TODO: Createで十分では
 func (au *ArticleUsecase) CreateArticle(ctx context.Context, a *model.Article, t string) error {
 	// tokenから投稿者を設定
 	u, err := au.su.GetUsernameFromToken(t)
 	if err != nil {
 		return err
 	}
-
-	p := &model.Post{Username: u}
-
-	// 投稿イベントを作成
-	pid, err := au.pr.Store(ctx, p)
-	if err != nil {
-		return err
-	}
-	a.PostId = pid
 
 	// 投稿者を設定
 	a.Username = u
@@ -50,6 +40,14 @@ func (au *ArticleUsecase) CreateArticle(ctx context.Context, a *model.Article, t
 	}
 
 	return nil
+}
+
+func (au *ArticleUsecase) GetById(ctx context.Context, id int64) (*model.ViewArticle, error) {
+	article, err := au.ar.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return article, nil
 }
 
 func (au *ArticleUsecase) GetMaxPageNumber(ctx context.Context, t string) (int, error) {

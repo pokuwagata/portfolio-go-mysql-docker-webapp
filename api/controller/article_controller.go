@@ -42,6 +42,25 @@ func (ac *ArticleController) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, "success")
 }
 
+func (ac *ArticleController) Get(c echo.Context) error {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	article, err := ac.au.GetById(ctx, id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, article)
+}
+
 // TODO: GetListByUserの方が適切
 func (ac *ArticleController) GetList(c echo.Context) error {
 	n, _ := strconv.Atoi(c.QueryParam("number"))
@@ -109,6 +128,7 @@ func (ac *ArticleController) getMaxPageNumber(c echo.Context) (int, error) {
 }
 
 func (ac *ArticleController) Delete(c echo.Context) error {
+	// TODO: pathParameterに変更
 	id, err := strconv.ParseInt(c.QueryParam("id"), 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})

@@ -15,7 +15,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-// hogehoge
 func main() {
 	e := echo.New()
 	logger.Init(e)
@@ -25,10 +24,9 @@ func main() {
 
 	ur := repository.NewUserRepository(db)
 	ar := repository.NewArticleRepository(db)
-	pr := repository.NewPostRepository(db)
 	uu := usecase.NewUserUsecase(ur)
 	su := usecase.NewSessionUsecase(ur)
-	au := usecase.NewArticleUsecase(ar, ur, pr, su)
+	au := usecase.NewArticleUsecase(ar, ur, su)
 	sc := controller.NewSessionController(su)
 	uc := controller.NewUserController(uu)
 	ac := controller.NewArticleController(au)
