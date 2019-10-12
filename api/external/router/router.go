@@ -28,5 +28,5 @@ func Init(
 	a.POST("/article/:id", ac.Update)
 	a.POST("/article", ac.Create)
 	a.DELETE("/article", ac.Delete)
-	a.GET("/articles", ac.GetList)
+	a.GET("/articles", ac.GetListByUser)
 }

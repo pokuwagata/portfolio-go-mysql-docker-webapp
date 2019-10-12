@@ -67,7 +67,7 @@ func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.View
 	return &a, nil
 }
 
-func (ar *ArticleRepository) GetArticleCount(ctx context.Context, un string) (int, error) {
+func (ar *ArticleRepository) GetArticleCountByUser(ctx context.Context, un string) (int, error) {
 	query := `SELECT count(id) FROM articles ` +
 		`WHERE user_id = (select id from users where username = ?) AND article_status_id = ?`
 	stmt, err := ar.db.PrepareContext(ctx, query)
@@ -83,7 +83,7 @@ func (ar *ArticleRepository) GetArticleCount(ctx context.Context, un string) (in
 	return count, nil
 }
 
-func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, un string, n int) ([]model.ViewArticle, error) {
+func (ar *ArticleRepository) GetByUserAndPageNumber(ctx context.Context, un string, n int) ([]model.ViewArticle, error) {
 	uidQuery := `SELECT id FROM users WHERE username = ?`
 	stmt, err := ar.db.PrepareContext(ctx, uidQuery)
 	if err != nil {
