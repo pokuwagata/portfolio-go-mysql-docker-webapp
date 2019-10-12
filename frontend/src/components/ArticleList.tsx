@@ -15,8 +15,9 @@ export const ArticleList = (props: ArticleListProps) => {
   const flushDispath = React.useContext(FlushDispatchContext);
 
   const fetchArticles = async (pageNumber: number) => {
+    setLoading(true);
     try {
-      const res = await fetch('api/admin/articles?number=' + pageNumber, {
+      const res = await fetch('api/articles?number=' + pageNumber, {
         method: 'GET',
         headers: {
           'content-type': 'application/json',
@@ -50,6 +51,7 @@ export const ArticleList = (props: ArticleListProps) => {
 
   React.useEffect(() => {
     fetchArticles(pageNumber);
+    window.scrollTo(0, 0);
   }, [pageNumber]);
 
   return (
