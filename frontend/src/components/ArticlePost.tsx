@@ -44,13 +44,12 @@ export const ArticlePost = (props: ArticlePostProps) => {
           message: '記事の取得に失敗しました。' + error,
         },
       });
-      setLoading(false);
     }
   };
 
   React.useEffect(() => {
+    // 記事のIdをURLから取得できる場合は編集
     if (id) {
-      // 記事のIdをURLから取得できる場合は編集
       fetchArticle(id);
     } else {
       // 記事のIdをURLから取得できない場合は新規作成
@@ -104,7 +103,6 @@ export const ArticlePost = (props: ArticlePostProps) => {
         },
       });
     }
-    setLoading(false);
   };
 
   const validateTitle = (): boolean => {
