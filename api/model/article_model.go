@@ -19,6 +19,7 @@ type ViewArticle struct {
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	UpdatedAt time.Time `json:"updatedAt"`
+	Username  string    `json:"username"`
 }
 
 type FirstGetListResponse struct {

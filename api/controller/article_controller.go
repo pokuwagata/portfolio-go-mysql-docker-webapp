@@ -69,7 +69,6 @@ func (ac *ArticleController) Update(c echo.Context) error {
 
 func (ac *ArticleController) Get(c echo.Context) error {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	c.Logger().Debug(id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
 	}
@@ -85,6 +84,32 @@ func (ac *ArticleController) Get(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, article)
+}
+
+func (ac *ArticleController) GetList(c echo.Context) error {
+	n, _ := strconv.Atoi(c.QueryParam("number"))
+	if n > 1 {
+		articles, err := ac.getByPageNumber(c, n)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		}
+
+		return c.JSON(http.StatusOK, model.GetListResponse{Articles: articles})
+	} else if n == 1 {
+		max, err := ac.getMaxPageNumber(c)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		}
+
+		articles, err := ac.getByPageNumber(c, n)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		}
+
+		return c.JSON(http.StatusOK, model.FirstGetListResponse{Articles: articles, Max: max})
+	} else {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: "リクエストパラメータが不正です"})
+	}
 }
 
 func (ac *ArticleController) GetListByUser(c echo.Context) error {
@@ -113,6 +138,20 @@ func (ac *ArticleController) GetListByUser(c echo.Context) error {
 	}
 }
 
+func (ac *ArticleController) getByPageNumber(c echo.Context, n int) ([]model.ViewArticle, error) {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	articles, err := ac.au.GetByPageNumber(ctx, n)
+	if err != nil {
+		return nil, err
+	}
+
+	return articles, nil
+}
+
 func (ac *ArticleController) getByUserAndPageNumber(c echo.Context, n int) ([]model.ViewArticle, error) {
 	t := GetTokenFromHeader(c)
 
@@ -127,6 +166,20 @@ func (ac *ArticleController) getByUserAndPageNumber(c echo.Context, n int) ([]mo
 	}
 
 	return articles, nil
+}
+
+func (ac *ArticleController) getMaxPageNumber(c echo.Context) (int, error) {
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	max, err := ac.au.GetMaxPageNumber(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	return max, nil
 }
 
 func (ac *ArticleController) getMaxPageNumberByUser(c echo.Context) (int, error) {

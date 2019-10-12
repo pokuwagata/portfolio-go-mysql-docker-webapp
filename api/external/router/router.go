@@ -19,6 +19,7 @@ func Init(
 	e.POST("/user", uc.Create)
 	e.POST("/session", sc.Create)
 	e.GET("/articles/:id", ac.Get)
+	e.GET("/articles", ac.GetList)
 
 	// 認証・認可が必要なルーティング
 	a := e.Group("/admin")
