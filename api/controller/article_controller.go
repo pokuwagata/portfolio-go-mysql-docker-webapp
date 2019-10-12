@@ -42,8 +42,34 @@ func (ac *ArticleController) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, "success")
 }
 
+func (ac *ArticleController) Update(c echo.Context) error {
+	a := &model.Article{}
+
+	if err := c.Bind(a); err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	if err := c.Validate(a); err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	t := GetTokenFromHeader(c)
+	err := ac.au.Update(ctx, a, t)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, "success")
+}
+
 func (ac *ArticleController) Get(c echo.Context) error {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	c.Logger().Debug(id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
 	}

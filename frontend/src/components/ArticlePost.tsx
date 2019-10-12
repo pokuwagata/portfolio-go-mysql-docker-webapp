@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useLocation } from 'react-router-dom';
 import { FlushType } from './Flush';
 import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 
@@ -9,6 +9,9 @@ export type ArticlePostProps = {
 };
 
 export const ArticlePost = (props: ArticlePostProps) => {
+  const id = new URLSearchParams(useLocation().search).get('id');
+
+  const [loading, setLoading] = React.useState(true);
   const [title, setTitle] = React.useState('');
   const [titleErrors, setTitleErrors] = React.useState([]);
   const [content, setContent] = React.useState('');
@@ -17,57 +20,91 @@ export const ArticlePost = (props: ArticlePostProps) => {
 
   const flushDispath = React.useContext(FlushDispatchContext);
 
+  const fetchArticle = async (id: string) => {
+    try {
+      const res = await fetch('api/articles/' + id, {
+        method: 'GET',
+      });
+      const json = await res.json();
+      if (res.ok) {
+        flushDispath({
+          type: FlushActionType.HIDDEN,
+        });
+        setTitle(json.title);
+        setContent(json.content);
+        setLoading(false);
+      } else {
+        throw new Error(json.message);
+      }
+    } catch (error) {
+      flushDispath({
+        type: FlushActionType.VISIBLE,
+        payload: {
+          type: FlushType.ERROR,
+          message: '記事の取得に失敗しました。' + error,
+        },
+      });
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (id) {
+      // 記事のIdをURLから取得できる場合は編集
+      fetchArticle(id);
+    } else {
+      // 記事のIdをURLから取得できない場合は新規作成
+      setLoading(false);
+    }
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // 少なくとも1つのフォームにバリデーションエラーが発生している場合は処理を中断
     const isValidTitle = validateTitle();
     const isValidContent = validateContent();
     if (!(isValidTitle && isValidContent)) return;
-    fetch('api/admin/article', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: 'Bearer ' + localStorage.getItem('portfolio-jwt-token'),
-      },
-      body: JSON.stringify({
-        title: title,
-        content: content,
-      }),
-    })
-      .then(res => {
-        return new Promise(resolve =>
-          res.json().then(json =>
-            resolve({
-              ok: res.ok,
-              json,
-            })
-          )
-        );
-      })
-      .then(res => {
-        // TODO: as any以外の方法
-        if ((res as any).ok) {
-          flushDispath({
-            type: FlushActionType.VISIBLE,
-            payload: {
-              type: FlushType.SUCCESS,
-              message: '記事の投稿に成功しました',
-            },
-          });
-          setPostDone(true);
-        } else {
-          throw new Error((res as any).json.message);
-        }
-      })
-      .catch(error => {
+    postArticle();
+  };
+
+  const postArticle = async () => {
+    try {
+      const res = await fetch('api/admin/article' + (id ? '/' + id : ''), {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          Authorization:
+            'Bearer ' + localStorage.getItem('portfolio-jwt-token'),
+        },
+        body: JSON.stringify({
+          title: title,
+          content: content,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok) {
         flushDispath({
           type: FlushActionType.VISIBLE,
           payload: {
-            type: FlushType.ERROR,
-            message: '記事の投稿に失敗しました。' + error,
+            type: FlushType.SUCCESS,
+            message: '記事の' + (id ? '更新' : '投稿') + 'に成功しました',
           },
         });
+        setPostDone(true);
+      } else {
+        throw new Error(json.message);
+      }
+    } catch (error) {
+      flushDispath({
+        type: FlushActionType.VISIBLE,
+        payload: {
+          type: FlushType.ERROR,
+          message:
+            '記事の' + (id ? '更新' : '投稿') + 'に失敗しました。' + error,
+        },
       });
+    }
+    setLoading(false);
   };
 
   const validateTitle = (): boolean => {
@@ -101,8 +138,11 @@ export const ArticlePost = (props: ArticlePostProps) => {
   };
 
   return !props.isLoggedIn || postDone ? (
-    <Redirect to="/" />
-  ) : ( // ログイン状態かつ記事未投稿状態の場合
+    <Redirect to={id ? '/management' : '/'} />
+  ) : loading ? (
+    <p>loading...</p>
+  ) : (
+    // ログイン状態かつ記事未投稿状態の場合
     <div className="justify-content-center">
       <div>
         <h1 className="mb-3">記事の投稿</h1>
@@ -117,6 +157,7 @@ export const ArticlePost = (props: ArticlePostProps) => {
                 }
                 placeholder="タイトルを入力"
                 maxLength={45}
+                value={title}
                 onChange={e => setTitle(e.target.value)}
               />
               {titleErrors.length > 0 && (
@@ -133,6 +174,7 @@ export const ArticlePost = (props: ArticlePostProps) => {
                 }
                 placeholder="投稿したい内容を入力"
                 maxLength={1000}
+                value={content}
                 onChange={e => setContent(e.target.value)}
                 rows={15}
               />

@@ -42,6 +42,24 @@ func (au *ArticleUsecase) CreateArticle(ctx context.Context, a *model.Article, t
 	return nil
 }
 
+func (au *ArticleUsecase) Update(ctx context.Context, a *model.Article, t string) error {
+	// tokenから投稿者を設定
+	u, err := au.su.GetUsernameFromToken(t)
+	if err != nil {
+		return err
+	}
+
+	// 投稿者を設定
+	a.Username = u
+
+	err = au.ar.Update(ctx, a)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (au *ArticleUsecase) GetById(ctx context.Context, id int64) (*model.ViewArticle, error) {
 	article, err := au.ar.GetById(ctx, id)
 	if err != nil {

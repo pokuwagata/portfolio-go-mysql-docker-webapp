@@ -25,6 +25,7 @@ func Init(
 	jwtauth.Init(a)
 	a.DELETE("/user", uc.Delete)
 	a.GET("/session", sc.GetUsernameFromToken)
+	a.POST("/article/:id", ac.Update)
 	a.POST("/article", ac.Create)
 	a.DELETE("/article", ac.Delete)
 	a.GET("/articles", ac.GetList)

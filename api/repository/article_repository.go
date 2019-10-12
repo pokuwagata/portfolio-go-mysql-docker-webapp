@@ -18,8 +18,8 @@ func NewArticleRepository(db *sql.DB) *ArticleRepository {
 
 func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error {
 	query := `INSERT articles SET title=?, content=?, ` +
-		`user_id=(SELECT id FROM users where username=?), ` +
-		`article_status_id=(SELECT id FROM article_statuses where status= ?)`
+		`user_id=(SELECT id FROM users WHERE username=?), ` +
+		`article_status_id=(SELECT id FROM article_statuses WHERE status= ?)`
 	stmt, err := ar.db.PrepareContext(ctx, query)
 	if err != nil {
 		return err
@@ -33,8 +33,26 @@ func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error 
 	return nil
 }
 
+func (ar *ArticleRepository) Update(ctx context.Context, a *model.Article) error {
+	query := `UPDATE articles SET title=?, content=?, ` +
+		`user_id=(SELECT id FROM users WHERE username=?), ` +
+		`article_status_id=(SELECT id FROM article_statuses WHERE status= ?)`
+	stmt, err := ar.db.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.ExecContext(ctx, a.Title, a.Content, a.Username, constant.PUBLISHED)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.ViewArticle, error) {
-	query := `select id, title, content, updated_at from articles where ID = ? and article_status_id = ?`
+	query := `SELECT id, title, content, updated_at FROM articles ` +
+	`WHERE ID = ? and article_status_id=(SELECT id FROM article_statuses WHERE status= ?)`
 
 	stmt, err := ar.db.PrepareContext(ctx, query)
 	if err != nil {
@@ -42,7 +60,7 @@ func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.View
 	}
 
 	var a model.ViewArticle
-	if err := stmt.QueryRowContext(ctx, id, 1).Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt); err != nil {
+	if err := stmt.QueryRowContext(ctx, id, constant.PUBLISHED).Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt); err != nil {
 		return nil, err
 	}
 
