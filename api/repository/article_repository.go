@@ -51,7 +51,8 @@ func (ar *ArticleRepository) Update(ctx context.Context, a *model.Article) error
 }
 
 func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.ViewArticle, error) {
-	query := `SELECT id, title, content, updated_at FROM articles ` +
+	query := `SELECT id, title, content, updated_at, (SELECT username FROM users WHERE id = articles.user_id) ` +
+		`FROM articles ` +
 		`WHERE ID = ? and article_status_id=(SELECT id FROM article_statuses WHERE status= ?)`
 
 	stmt, err := ar.db.PrepareContext(ctx, query)
@@ -60,7 +61,7 @@ func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.View
 	}
 
 	var a model.ViewArticle
-	if err := stmt.QueryRowContext(ctx, id, constant.PUBLISHED).Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt); err != nil {
+	if err := stmt.QueryRowContext(ctx, id, constant.PUBLISHED).Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt, &a.Username); err != nil {
 		return nil, err
 	}
 

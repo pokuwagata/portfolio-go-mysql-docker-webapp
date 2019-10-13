@@ -9,6 +9,7 @@ import { FlushType } from './Flush';
 import { ArticlePost } from './ArticlePost';
 import { ArticleManagement } from './ArticleManagement';
 import { FlushProvider } from './FlushProvider';
+import { ArticleDetail } from './ArticleDetail';
 
 type AppProps = {};
 type AppState = {};
@@ -116,6 +117,10 @@ export const App = (props: AppProps) => {
                   {...props} // TODO: 不要な場合は削除する
                 />
               )}
+            />
+            <Route
+              path="/article"
+              render={() => <ArticleDetail isLoggedIn={isLoggedIn} />}
             />
           </Switch>
         </div>
