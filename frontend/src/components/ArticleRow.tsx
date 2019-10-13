@@ -23,7 +23,7 @@ export const ArticleRow = (props: ArticleRowProps) => {
       <div className="d-flex align-items-center mb-2">
         <h2>{props.title}</h2>
         <div className="ml-auto">
-          <div>{props.updatedAt}</div>
+          <div>{new Date(props.updatedAt).toLocaleString()}</div>
         </div>
       </div>
       {/* <div>{getViewContent(props.content)}</div> */}
