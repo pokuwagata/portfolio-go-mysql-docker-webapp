@@ -67,7 +67,7 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
           </div>
         </div>
       </div>
-      <div className="container mb-5" style={{ minHeight: '35vh' }}>
+      <div className="mb-5" style={{ minHeight: '35vh' }}>
         {loading ? (
           <p>loading...</p>
         ) : articleList.length === 0 ? (

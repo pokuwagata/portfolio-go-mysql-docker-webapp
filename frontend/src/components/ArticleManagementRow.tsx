@@ -22,8 +22,8 @@ export const ArticleManagementRow = (props: ArticleManagementRowProps) => {
   };
 
   return (
-    <div className="row mb-3 align-items-center">
-      <div className="sm-col-auto mr-1">
+    <div className="d-flex mb-3 align-items-center">
+      <div className="mr-1">
         <input
           className="form-check-input position-static"
           type="checkbox"
@@ -32,13 +32,19 @@ export const ArticleManagementRow = (props: ArticleManagementRowProps) => {
           checked={props.checked}
         />
       </div>
-      <div className="sm-col-6 mr-5">
-        <label className="form-check-label" htmlFor={props.id}>
+      <div
+        className="mr-5"
+        style={{ width: '50%', overflowWrap: 'break-word' }}
+      >
+        <label
+          className="form-check-label"
+          htmlFor={props.id}
+        >
           {props.title}
         </label>
       </div>
-      <div className="sm-col-auto">{new Date(props.updatedAt).toString()}</div>
-      <div className="ml-md-auto">
+      <div className="">{new Date(props.updatedAt).toLocaleString()}</div>
+      <div className="ml-auto">
         <Link to={'/post?id=' + props.id}>
           <button type="button" className="btn btn-primary">
             編集
