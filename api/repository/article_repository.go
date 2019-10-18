@@ -17,16 +17,32 @@ func NewArticleRepository(db *sql.DB) *ArticleRepository {
 }
 
 func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error {
-	query := `INSERT articles SET title=?, content=?, ` +
-		`user_id=(SELECT id FROM users WHERE username=?), ` +
-		`article_status_id=(SELECT id FROM article_statuses WHERE status= ?)`
-	stmt, err := ar.db.PrepareContext(ctx, query)
-	if err != nil {
-		return err
-	}
+	query :=
+		`INSERT
+			articles
+		SET
+			title = ?,
+			content = ?,
+			user_id =(
+				SELECT
+					id
+				FROM
+					users
+				WHERE
+					username = ?
+			),
+			article_status_id =(
+				SELECT
+					id
+				FROM
+					article_statuses
+				WHERE
+					status = ?
+			)`
 
-	_, err = stmt.ExecContext(ctx, a.Title, a.Content, a.Username, a.ArticleStatus)
-	if err != nil {
+	if _, err := ar.db.ExecContext(
+		ctx, query, a.Title, a.Content, a.Username, a.ArticleStatus);
+		err != nil {
 		return err
 	}
 
