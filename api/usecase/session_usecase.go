@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+type SessionUsecaseInterface interface {
+	CreateSession(ctx context.Context, s *model.Session) (string, error)
+	GetUsernameFromToken(t string) (string, error)
+}
+
 type SessionUsecase struct {
 	ur *repository.UserRepository
 }
@@ -46,8 +51,8 @@ func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (
 	return t, nil
 }
 
-func (su *SessionUsecase) GetUsernameFromToken(t string) (string, error) {
-	token, err := jwt.ParseWithClaims(t, &jwtauth.JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+func (su *SessionUsecase) GetUsernameFromToken(clientToken string) (string, error) {
+	token, err := jwt.ParseWithClaims(clientToken, &jwtauth.JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtauth.SECRET_KEY), nil
 	})
 	if err != nil {

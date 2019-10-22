@@ -8,9 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserRepository interface {
-	Store(ctx context.Context, u *model.User) error
-}
 
 type UserUsecase struct {
 	r UserRepository

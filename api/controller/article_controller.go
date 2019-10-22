@@ -34,7 +34,7 @@ func (ac *ArticleController) Create(c echo.Context) error {
 	}
 
 	t := GetTokenFromHeader(c)
-	err := ac.au.CreateArticle(ctx, a, t)
+	err := ac.au.Create(ctx, a, t)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
 	}

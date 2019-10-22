@@ -3,25 +3,23 @@ package usecase
 import (
 	"api/constant"
 	"api/model"
-	"api/repository"
 	"context"
 )
 
 type ArticleUsecase struct {
-	ar *repository.ArticleRepository
-	ur *repository.UserRepository
-	su *SessionUsecase
+	ar ArticleRepository
+	ur UserRepository
+	su SessionUsecaseInterface
 }
 
 func NewArticleUsecase(
-	ar *repository.ArticleRepository,
-	ur *repository.UserRepository,
-	su *SessionUsecase) *ArticleUsecase {
+	ar ArticleRepository,
+	ur UserRepository,
+	su SessionUsecaseInterface) *ArticleUsecase {
 	return &ArticleUsecase{ar, ur, su}
 }
 
-// TODO: Createで十分では
-func (au *ArticleUsecase) CreateArticle(ctx context.Context, a *model.Article, t string) error {
+func (au *ArticleUsecase) Create(ctx context.Context, a *model.Article, t string) error {
 	// tokenから投稿者を設定
 	u, err := au.su.GetUsernameFromToken(t)
 	if err != nil {
@@ -75,11 +73,11 @@ func (au *ArticleUsecase) GetMaxPageNumber(ctx context.Context) (int, error) {
 	}
 
 	max := cnt / constant.ARTICLES_PER_PAGE
-	if cnt % constant.ARTICLES_PER_PAGE != 0 {
-		max+=1
+	if cnt%constant.ARTICLES_PER_PAGE != 0 {
+		max += 1
 	}
 
-	return max, nil;
+	return max, nil
 }
 
 func (au *ArticleUsecase) GetMaxPageNumberByUser(ctx context.Context, t string) (int, error) {
@@ -95,11 +93,11 @@ func (au *ArticleUsecase) GetMaxPageNumberByUser(ctx context.Context, t string) 
 	}
 
 	max := cnt / constant.ARTICLES_PER_PAGE
-	if cnt % constant.ARTICLES_PER_PAGE != 0 {
-		max+=1
+	if cnt%constant.ARTICLES_PER_PAGE != 0 {
+		max += 1
 	}
 
-	return max, nil;
+	return max, nil
 }
 
 func (au *ArticleUsecase) GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error) {
