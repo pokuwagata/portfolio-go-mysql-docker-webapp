@@ -6,6 +6,17 @@ import (
 	"context"
 )
 
+type ArticleUsecaseInterface interface {
+	Create(ctx context.Context, a *model.Article, t string) error
+	Update(ctx context.Context, a *model.Article, t string) error
+	GetById(ctx context.Context, id int64) (*model.ViewArticle, error)
+	GetMaxPageNumber(ctx context.Context) (int, error)
+	GetMaxPageNumberByUser(ctx context.Context, t string) (int, error)
+	GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error)
+	GetByUserAndPageNumber(ctx context.Context, n int, t string) ([]model.ViewArticle, error)
+	Delete(ctx context.Context, articleId int64, token string) (int64, error)
+}
+
 type ArticleUsecase struct {
 	ar ArticleRepository
 	ur UserRepository

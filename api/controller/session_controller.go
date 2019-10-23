@@ -1,18 +1,18 @@
 package controller
 
 import (
-	"context"
-	"net/http"
-	"api/usecase"
 	"api/model"
+	"api/usecase"
+	"context"
 	"github.com/labstack/echo"
+	"net/http"
 )
 
 type SessionController struct {
 	su *usecase.SessionUsecase
 }
 
-func NewSessionController (su *usecase.SessionUsecase) *SessionController {
+func NewSessionController(su *usecase.SessionUsecase) *SessionController {
 	return &SessionController{su}
 }
 
@@ -38,10 +38,14 @@ func (sc *SessionController) Create(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, map[string]string{"token": t, "username": s.Username})
-} 
+}
 
 func (sc *SessionController) GetUsernameFromToken(c echo.Context) error {
-	token := GetTokenFromHeader(c)
+	token, err := GetTokenFromHeader(c)
+	if err != nil {
+		return err
+	}
+
 	name, err := sc.su.GetUsernameFromToken(token)
 
 	if err != nil {

@@ -10,10 +10,10 @@ import (
 )
 
 type ArticleController struct {
-	au *usecase.ArticleUsecase
+	au usecase.ArticleUsecaseInterface
 }
 
-func NewArticleController(au *usecase.ArticleUsecase) *ArticleController {
+func NewArticleController(au usecase.ArticleUsecaseInterface) *ArticleController {
 	return &ArticleController{au}
 }
 
@@ -33,9 +33,12 @@ func (ac *ArticleController) Create(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	t := GetTokenFromHeader(c)
-	err := ac.au.Create(ctx, a, t)
+	token, err := GetTokenFromHeader(c)
 	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	if err := ac.au.Create(ctx, a, token); err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
@@ -58,9 +61,12 @@ func (ac *ArticleController) Update(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	t := GetTokenFromHeader(c)
-	err := ac.au.Update(ctx, a, t)
+	token, err := GetTokenFromHeader(c)
 	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	if err := ac.au.Update(ctx, a, token); err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
@@ -153,14 +159,17 @@ func (ac *ArticleController) getByPageNumber(c echo.Context, n int) ([]model.Vie
 }
 
 func (ac *ArticleController) getByUserAndPageNumber(c echo.Context, n int) ([]model.ViewArticle, error) {
-	t := GetTokenFromHeader(c)
+	token, err := GetTokenFromHeader(c)
+	if err != nil {
+		return nil, err
+	}
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	articles, err := ac.au.GetByUserAndPageNumber(ctx, n, t)
+	articles, err := ac.au.GetByUserAndPageNumber(ctx, n, token)
 	if err != nil {
 		return nil, err
 	}
@@ -183,14 +192,17 @@ func (ac *ArticleController) getMaxPageNumber(c echo.Context) (int, error) {
 }
 
 func (ac *ArticleController) getMaxPageNumberByUser(c echo.Context) (int, error) {
-	t := GetTokenFromHeader(c)
+	token, err := GetTokenFromHeader(c)
+	if err != nil {
+		return 0, err
+	}
 
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	max, err := ac.au.GetMaxPageNumberByUser(ctx, t)
+	max, err := ac.au.GetMaxPageNumberByUser(ctx, token)
 	if err != nil {
 		return 0, err
 	}
@@ -210,7 +222,13 @@ func (ac *ArticleController) Delete(c echo.Context) error {
 		ctx = context.Background()
 	}
 
-	token := GetTokenFromHeader(c)
+	token, err := GetTokenFromHeader(c)
+
+	if err !=nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
+	// TODO: idを返す必要ある？
 	_, err = ac.au.Delete(ctx, id, token)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
