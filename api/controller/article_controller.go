@@ -46,7 +46,13 @@ func (ac *ArticleController) Create(c echo.Context) error {
 }
 
 func (ac *ArticleController) Update(c echo.Context) error {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+
 	a := &model.Article{}
+	a.ID = id
 
 	if err := c.Bind(a); err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
@@ -224,7 +230,7 @@ func (ac *ArticleController) Delete(c echo.Context) error {
 
 	token, err := GetTokenFromHeader(c)
 
-	if err !=nil {
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 

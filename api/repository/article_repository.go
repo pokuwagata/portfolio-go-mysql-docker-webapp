@@ -41,8 +41,7 @@ func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error 
 			)`
 
 	if _, err := ar.db.ExecContext(
-		ctx, query, a.Title, a.Content, a.Username, a.ArticleStatus);
-		err != nil {
+		ctx, query, a.Title, a.Content, a.Username, a.ArticleStatus); err != nil {
 		return err
 	}
 
@@ -50,16 +49,33 @@ func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error 
 }
 
 func (ar *ArticleRepository) Update(ctx context.Context, a *model.Article) error {
-	query := `UPDATE articles SET title=?, content=?, ` +
-		`user_id=(SELECT id FROM users WHERE username=?), ` +
-		`article_status_id=(SELECT id FROM article_statuses WHERE status= ?)`
-	stmt, err := ar.db.PrepareContext(ctx, query)
-	if err != nil {
-		return err
-	}
-
-	_, err = stmt.ExecContext(ctx, a.Title, a.Content, a.Username, constant.PUBLISHED)
-	if err != nil {
+	query :=
+		`
+		UPDATE
+			articles
+		SET
+			title = ?,
+			content = ?,
+			user_id =(
+				SELECT
+					id
+				FROM
+					users
+				WHERE
+					username = ?
+			),
+			article_status_id =(
+				SELECT
+					id
+				FROM
+					article_statuses
+				WHERE
+					status = ?
+			)
+		WHERE
+			id = ?
+	`
+	if _, err := ar.db.ExecContext(ctx, query, a.Title, a.Content, a.Username, constant.PUBLISHED, a.ID); err != nil {
 		return err
 	}
 
