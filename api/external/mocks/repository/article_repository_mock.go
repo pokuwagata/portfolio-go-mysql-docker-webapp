@@ -20,6 +20,12 @@ func (au *ArticleRepositoryMock) Store(ctx context.Context, a *model.Article) er
 }
 
 func (au *ArticleRepositoryMock) Update(ctx context.Context, a *model.Article) error {
+	args := au.Called(ctx, a)
+	if args.Get(0) != nil {
+		return args.Error(0)
+	} else {
+		return nil
+	}
 	return nil
 }
 

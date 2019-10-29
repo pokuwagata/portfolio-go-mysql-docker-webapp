@@ -47,3 +47,42 @@ func TestCreate(t *testing.T) {
 		t.Fatalf("status code '%d' was not expected:", rec.Code)
 	}
 }
+
+func TestUpdate(t *testing.T) {
+	a := &model.Article{
+		ID:      int64(1),
+		Title:   "タイトル",
+		Content: "コンテンツ",
+	}
+	j, err := json.Marshal(a)
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected:", err)
+	}
+
+	token := "token"
+
+	e := echo.New()
+	validater.Init(e)
+
+	req, _ := http.NewRequest(echo.POST, "/article/1", strings.NewReader(string(j)))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	req.Header.Set(echo.HeaderAuthorization, strings.Join([]string{"Bearer", token}, " "))
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/articles/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	au := new(usecaseMocks.ArticleUsecaseMock)
+	au.On("Update", context.TODO(), a, token).Return(nil)
+	ac := NewArticleController(au)
+
+	if err := ac.Update(c); err != nil {
+		t.Fatalf("an error '%s' was not expected:", err)
+	}
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status code '%d' was not expected:", rec.Code)
+	}
+}
