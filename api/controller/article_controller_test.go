@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"errors"
 )
 
 func TestCreate(t *testing.T) {
@@ -85,4 +86,68 @@ func TestUpdate(t *testing.T) {
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status code '%d' was not expected:", rec.Code)
 	}
+}
+
+func TestGetById(t *testing.T) {
+	a := &model.Article{
+		ID:      int64(1),
+		Title:   "タイトル",
+		Content: "コンテンツ",
+	}
+	j, err := json.Marshal(a)
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected:", err)
+	}
+	e := echo.New()
+	validater.Init(e)
+
+	t.Run("success", func(t *testing.T) {
+		req, _ := http.NewRequest(echo.GET, "/article/1", strings.NewReader(string(j)))
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/articles/:id")
+		c.SetParamNames("id")
+		c.SetParamValues("1")
+
+		au := new(usecaseMocks.ArticleUsecaseMock)
+		au.On("GetById", context.TODO(), a.ID).Return(a, nil)
+		ac := NewArticleController(au)
+
+		if err := ac.GetById(c); err != nil {
+			t.Fatalf("an error '%s' was not expected:", err)
+		}
+
+		if rec.Code != http.StatusOK {
+			t.Fatalf("status code '%d' was not expected:", rec.Code)
+		}
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		req, _ := http.NewRequest(echo.GET, "/article/0", strings.NewReader(string(j)))
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/articles/:id")
+		c.SetParamNames("id")
+		c.SetParamValues("0")
+
+		au := new(usecaseMocks.ArticleUsecaseMock)
+		mockErr := errors.New("mock error")
+		au.On("GetById", context.TODO(), int64(0)).Return(nil, mockErr)
+		ac := NewArticleController(au)
+
+		if err := ac.GetById(c); err != nil {
+			t.Fatalf("an error '%s' was not expected:", err)
+		}
+
+		if rec.Code != http.StatusBadRequest {
+			t.Fatalf("status code '%d' was not expected:", rec.Code)
+		}
+
+		var res model.ErrorResponse
+		if err := json.Unmarshal(rec.Body.Bytes(), &res); err != nil {
+			if res.Message != mockErr.Error() {
+				t.Fatalf("error message %s' was not expected:", res.Message)
+			}
+		}
+	})
 }

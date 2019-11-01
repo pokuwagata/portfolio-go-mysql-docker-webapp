@@ -24,7 +24,16 @@ func (au *ArticleUsecaseMock) Update(ctx context.Context, a *model.Article, t st
 }
 
 func (au *ArticleUsecaseMock) GetById(ctx context.Context, id int64) (*model.ViewArticle, error) {
-	return nil, nil
+	args := au.Called(ctx, id)
+	if args.Get(0) != nil {
+		if a, ok := args.Get(0).(*model.ViewArticle); ok {
+			return a, nil
+		} else {
+			return nil, nil
+		}
+	} else {
+		return nil, args.Error(1)
+	}
 }
 
 func (au *ArticleUsecaseMock) GetMaxPageNumber(ctx context.Context) (int, error) {

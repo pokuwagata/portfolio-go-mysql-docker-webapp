@@ -120,3 +120,41 @@ func TestUpdate(t *testing.T) {
 		sum.AssertExpectations(t)
 	})
 }
+
+func TestGetById(t *testing.T) {
+	a := &model.Article{
+		ID: int64(1),
+		Title:   "タイトル",
+		Content: "コンテンツ",
+	}
+
+	urm := new(repositoryMocks.UserRepositoryMock)
+
+	t.Run("success", func(t *testing.T) {
+		arm := new(repositoryMocks.ArticleRepositoryMock)
+		sum := new(usecaseMocks.SessionUsecaseMock)
+		arm.On("GetById", mock.Anything, a.ID).Return(nil, nil)
+
+		au := NewArticleUsecase(arm, urm, sum)
+		if _, err := au.GetById(context.TODO(), a.ID); err != nil {
+			t.Fatalf("an error '%s' was not expected:", err)
+		}
+
+		arm.AssertExpectations(t)
+	})
+
+	t.Run("error", func(t *testing.T) {
+		arm := new(repositoryMocks.ArticleRepositoryMock)
+		sum := new(usecaseMocks.SessionUsecaseMock)
+
+		mockErr := errors.New("mock error")
+		arm.On("GetById", mock.Anything, a.ID).Return(nil, mockErr)
+
+		au := NewArticleUsecase(arm, urm, sum)
+		if _, err := au.GetById(context.TODO(), a.ID); err.Error() != mockErr.Error() {
+			t.Fatalf("an error '%s' was expected:", mockErr)
+		}
+
+		arm.AssertExpectations(t)
+	})
+}

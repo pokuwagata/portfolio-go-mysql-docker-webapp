@@ -79,7 +79,7 @@ func (ac *ArticleController) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, "success")
 }
 
-func (ac *ArticleController) Get(c echo.Context) error {
+func (ac *ArticleController) GetById(c echo.Context) error {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
