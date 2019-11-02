@@ -113,23 +113,34 @@ func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.View
 		`
 
 	var a model.ViewArticle
-	if err := ar.db.QueryRowContext(ctx, query, id, constant.PUBLISHED).Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt, &a.Username); err != nil {
-		return nil, err
+	if err := ar.db.QueryRowContext(ctx, query, id, constant.PUBLISHED).
+		Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt, &a.Username); err != nil {
+			return nil, err
 	}
 
 	return &a, nil
 }
 
 func (ar *ArticleRepository) GetArticleCount(ctx context.Context) (int, error) {
-	query := `SELECT count(id) FROM articles ` +
-		`WHERE article_status_id = ?`
-	stmt, err := ar.db.PrepareContext(ctx, query)
-	if err != nil {
-		return 0, err
-	}
+	query := 
+		`
+		SELECT
+			count(id)
+		FROM
+			articles
+		WHERE
+			article_status_id = (
+				SELECT
+					id
+				FROM
+					article_statuses
+				WHERE
+					status = ?
+			)
+		`
 
 	var count int
-	if err := stmt.QueryRowContext(ctx, 1).Scan(&count); err != nil {
+	if err := ar.db.QueryRowContext(ctx, query, constant.PUBLISHED).Scan(&count); err != nil {
 		return 0, err
 	}
 

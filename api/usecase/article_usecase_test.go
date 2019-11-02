@@ -158,3 +158,35 @@ func TestGetById(t *testing.T) {
 		arm.AssertExpectations(t)
 	})
 }
+
+func TestGetMaxPageNumber(t *testing.T) {
+	urm := new(repositoryMocks.UserRepositoryMock)
+
+	t.Run("success", func(t *testing.T) {
+		arm := new(repositoryMocks.ArticleRepositoryMock)
+		sum := new(usecaseMocks.SessionUsecaseMock)
+		arm.On("GetArticleCount", mock.Anything).Return(1, nil)
+
+		au := NewArticleUsecase(arm, urm, sum)
+		if _, err := au.GetMaxPageNumber(context.TODO()); err != nil {
+			t.Fatalf("an error '%s' was not expected:", err)
+		}
+
+		arm.AssertExpectations(t)
+	})
+
+	t.Run("error", func(t *testing.T) {
+		arm := new(repositoryMocks.ArticleRepositoryMock)
+		sum := new(usecaseMocks.SessionUsecaseMock)
+
+		mockErr := errors.New("mock error")
+		arm.On("GetArticleCount", mock.Anything).Return(0, mockErr)
+
+		au := NewArticleUsecase(arm, urm, sum)
+		if _, err := au.GetMaxPageNumber(context.TODO()); err.Error() != mockErr.Error() {
+			t.Fatalf("an error '%s' was expected:", mockErr)
+		}
+
+		arm.AssertExpectations(t)
+	})
+}
