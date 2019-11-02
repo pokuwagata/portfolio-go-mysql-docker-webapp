@@ -190,3 +190,41 @@ func TestGetMaxPageNumber(t *testing.T) {
 		arm.AssertExpectations(t)
 	})
 }
+
+func TestGetMaxPageNumberByUser(t *testing.T) {
+	urm := new(repositoryMocks.UserRepositoryMock)
+	token := "token"
+	name := "username"
+
+	t.Run("success", func(t *testing.T) {
+		arm := new(repositoryMocks.ArticleRepositoryMock)
+		sum := new(usecaseMocks.SessionUsecaseMock)
+		sum.On("GetUsernameFromToken", token).Return(name, nil)
+		arm.On("GetArticleCountByUser", mock.Anything, name).Return(1, nil)
+
+		au := NewArticleUsecase(arm, urm, sum)
+		if _, err := au.GetMaxPageNumberByUser(context.TODO(), token); err != nil {
+			t.Fatalf("an error '%s' was not expected:", err)
+		}
+
+		arm.AssertExpectations(t)
+		sum.AssertExpectations(t)
+	})
+
+	t.Run("error", func(t *testing.T) {
+		arm := new(repositoryMocks.ArticleRepositoryMock)
+		sum := new(usecaseMocks.SessionUsecaseMock)
+		mockErr := errors.New("mock error")
+
+		sum.On("GetUsernameFromToken", token).Return(name, nil)
+		arm.On("GetArticleCountByUser", mock.Anything, name).Return(0, mockErr)
+
+		au := NewArticleUsecase(arm, urm, sum)
+		if _, err := au.GetMaxPageNumberByUser(context.TODO(), token); err.Error() != mockErr.Error() {
+			t.Fatalf("an error '%s' was not expected:", err)
+		}
+
+		arm.AssertExpectations(t)
+		sum.AssertExpectations(t)
+	})
+}

@@ -195,3 +195,51 @@ func TestArticleCount(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
+func TestArticleCountByUser(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	query := 
+		`
+		SELECT
+			count(id)
+		FROM
+			articles
+		WHERE
+			user_id = (
+				select
+					id
+				from
+					users
+				where
+					username = ?
+			)
+			AND article_status_id = (
+				SELECT
+					id
+				FROM
+					article_statuses
+				WHERE
+					status = ?
+			)
+		`
+
+	row := sqlmock.NewRows([]string{"count"}).AddRow(1)
+	name := "テストユーザ"
+
+	mock.ExpectQuery(regexp.QuoteMeta(query)).
+		WithArgs(name, constant.PUBLISHED).
+		WillReturnRows(row)
+
+	ar := NewArticleRepository(db)
+	if _, err := ar.GetArticleCountByUser(context.TODO(), name); err != nil {
+		t.Errorf("error was not expected : %s", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}

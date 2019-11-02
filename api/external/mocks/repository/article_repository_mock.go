@@ -50,8 +50,13 @@ func (au *ArticleRepositoryMock) GetArticleCount(ctx context.Context) (int, erro
 	}
 }
 
-func (au *ArticleRepositoryMock) GetArticleCountByUser(ctx context.Context, un string) (int, error) {
-	return 0, nil
+func (au *ArticleRepositoryMock) GetArticleCountByUser(ctx context.Context, name string) (int, error) {
+	args := au.Called(ctx, name)
+	if args.Get(0) != 0 {
+		return args.Int(0), nil
+	} else {
+		return 0, args.Error(1)
+	}
 }
 
 func (au *ArticleRepositoryMock) GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error) {

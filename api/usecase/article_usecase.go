@@ -91,14 +91,15 @@ func (au *ArticleUsecase) GetMaxPageNumber(ctx context.Context) (int, error) {
 	return max, nil
 }
 
-func (au *ArticleUsecase) GetMaxPageNumberByUser(ctx context.Context, t string) (int, error) {
+func (au *ArticleUsecase) GetMaxPageNumberByUser(ctx context.Context, token string) (int, error) {
+	// TODO: GetMaxPageNumberとの共通化
 	// tokenから投稿者を設定
-	un, err := au.su.GetUsernameFromToken(t)
+	name, err := au.su.GetUsernameFromToken(token)
 	if err != nil {
 		return 0, err
 	}
 
-	cnt, err := au.ar.GetArticleCountByUser(ctx, un)
+	cnt, err := au.ar.GetArticleCountByUser(ctx, name)
 	if err != nil {
 		return 0, err
 	}

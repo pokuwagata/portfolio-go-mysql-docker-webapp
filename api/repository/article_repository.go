@@ -147,21 +147,41 @@ func (ar *ArticleRepository) GetArticleCount(ctx context.Context) (int, error) {
 	return count, nil
 }
 
-func (ar *ArticleRepository) GetArticleCountByUser(ctx context.Context, un string) (int, error) {
-	query := `SELECT count(id) FROM articles ` +
-		`WHERE user_id = (select id from users where username = ?) AND article_status_id = ?`
-	stmt, err := ar.db.PrepareContext(ctx, query)
-	if err != nil {
-		return 0, err
-	}
+func (ar *ArticleRepository) GetArticleCountByUser(ctx context.Context, name string) (int, error) {
+	// TODO: GetArticleCountとの共通化
+	query := 
+		`
+		SELECT
+			count(id)
+		FROM
+			articles
+		WHERE
+			user_id = (
+				select
+					id
+				from
+					users
+				where
+					username = ?
+			)
+			AND article_status_id = (
+				SELECT
+					id
+				FROM
+					article_statuses
+				WHERE
+					status = ?
+			)
+		`
 
 	var count int
-	if err := stmt.QueryRowContext(ctx, un, 1).Scan(&count); err != nil {
+	if err := ar.db.QueryRowContext(ctx, query, name, constant.PUBLISHED).Scan(&count); err != nil {
 		return 0, err
 	}
 
 	return count, nil
 }
+
 func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error) {
 	var rows *sql.Rows
 	// NOTE: index利用のため（サブクエリを使用しないため）に直接指定
