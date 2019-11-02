@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
+	"api/constant"
 )
 
 type ArticleController struct {
@@ -120,7 +121,7 @@ func (ac *ArticleController) GetList(c echo.Context) error {
 
 		return c.JSON(http.StatusOK, model.FirstGetListResponse{Articles: articles, Max: max})
 	} else {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: "リクエストパラメータが不正です"})
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: constant.ERR_INVALID_REQUEST_PARAM})
 	}
 }
 
@@ -146,7 +147,7 @@ func (ac *ArticleController) GetListByUser(c echo.Context) error {
 
 		return c.JSON(http.StatusOK, model.FirstGetListResponse{Articles: articles, Max: max})
 	} else {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: "リクエストパラメータが不正です"})
+		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: constant.ERR_INVALID_REQUEST_PARAM})
 	}
 }
 

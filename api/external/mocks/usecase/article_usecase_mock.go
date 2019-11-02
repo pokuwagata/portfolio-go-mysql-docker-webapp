@@ -37,7 +37,12 @@ func (au *ArticleUsecaseMock) GetById(ctx context.Context, id int64) (*model.Vie
 }
 
 func (au *ArticleUsecaseMock) GetMaxPageNumber(ctx context.Context) (int, error) {
-	return 0, nil
+	args := au.Called(ctx)
+	if args.Get(0) != 0 {
+		return args.Int(0), nil
+	} else {
+		return 0, args.Error(1)
+	}
 }
 
 func (au *ArticleUsecaseMock) GetMaxPageNumberByUser(ctx context.Context, t string) (int, error) {
