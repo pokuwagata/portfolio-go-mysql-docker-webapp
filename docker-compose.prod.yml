@@ -17,22 +17,48 @@ services:
     depends_on:
       - db
 
+  db:
+    build:
+      context: ./mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: sample_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+    - ./mysql/sql:/docker-entrypoint-initdb.d
+    - ./mysql/data:/var/lib/mysql
+    - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./mysql/logs:/logs
+    security_opt: # https://github.com/docker-library/mysql/issues/422
+    - seccomp:unconfined
+
   frontend:
     build:
       context: ./frontend
-      target: build
+#      target: build
     volumes:
       - ./frontend/dist:/frontend/dist
       - ./frontend/src:/frontend/src
-
-  nginx:
-    build:
-      context: ./frontend
-      target: nginx
+      - ./frontend/nginx/nginx.conf:/etc/nginx/nginx.conf
+#      - ./frontend/nginx/:/etc/nginx/
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       - api
-      - frontend
-    volumes:
-      - ./frontend/dist:/usr/share/nginx/html/
+#
+
+#  nginx:
+#    build:
+#      context: ./frontend
+#      target: nginx
+#    ports:
+#      - "80:80"
+#    depends_on:
+#      - api
+#      - frontend
+#    volumes:
+#      - ./frontend/dist:/usr/share/nginx/html/

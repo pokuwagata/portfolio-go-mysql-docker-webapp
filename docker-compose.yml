@@ -44,7 +44,7 @@ services:
       target: dev
     tty: true
     ports:
-      - "8080:8080"
+      - "80:8080"
     volumes:
       - ./frontend/dist:/frontend/dist
       - ./frontend/src:/frontend/src
