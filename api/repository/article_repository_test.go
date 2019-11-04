@@ -243,3 +243,30 @@ func TestArticleCountByUser(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
+
+func TestGetByPageNumber(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	query := ``
+
+	row := sqlmock.NewRows([]string{"id", "title", "content", "updated_at", "username"}).
+		AddRow(int64(1), "タイトル", "コンテンツ", time.Now(), "テストユーザ")
+
+	mock.ExpectQuery(regexp.QuoteMeta(query)).
+		WithArgs(int64(1), constant.PUBLISHED).
+		WillReturnRows(row)
+
+	ar := NewArticleRepository(db)
+	if _, err := ar.GetById(context.TODO(), int64(1)); err != nil {
+		t.Errorf("error was not expected : %s", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+}
