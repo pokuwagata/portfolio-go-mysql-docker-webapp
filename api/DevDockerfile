@@ -7,5 +7,6 @@ COPY go.sum .
 RUN GO111MODULE=on go mod download
 
 ADD . /go/src/server
+RUN touch /go/src/server/logs/access.log
 
 CMD /bin/bash

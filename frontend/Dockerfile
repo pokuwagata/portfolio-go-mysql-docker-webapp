@@ -7,11 +7,15 @@ RUN mkdir /frontend && cp -a /tmp/node_modules /frontend
 WORKDIR /frontend
 COPY package*.json ./
 RUN npm install
-COPY . .
-CMD ["npm", "run", "start"]
+COPY . ./
+# CMD ["npm", "run", "start"]
 
 FROM dev as build
+# RUN npm run build
+# COPY ./nginx ./nginx/
 RUN npm run build
 
-FROM nginx:1.14-alpine as nginx
-# COPY --from=build /frontend/dist /usr/share/nginx/html/
+FROM nginx:1.14-alpine
+COPY --from=build /frontend/dist /usr/share/nginx/html/
+# COPY --from=build /frontned/nginx/nginx.conf /etc/nginx/nginx.conf
+# CMD /bin/bash
