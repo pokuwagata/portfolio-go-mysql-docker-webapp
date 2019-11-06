@@ -184,8 +184,8 @@ func (ar *ArticleRepository) GetArticleCountByUser(ctx context.Context, name str
 
 func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error) {
 	var rows *sql.Rows
-	// NOTE: index利用のため（サブクエリを使用しないため）に直接指定
-	// idが初期データの投入順に依存するため変更時は修正が必要
+	// NOTE: index利用のため（サブクエリを使用しないため）にarticle_status_idをハードコーディング
+	// (idが初期データの投入順に依存するため変更時は修正が必要)
 	artStaId := 1
 
 	if n == 1 {
