@@ -12,8 +12,6 @@ services:
       - "5000:5000"
     volumes: 
       - ./api/logs:/go/src/server/logs
-      - ./api/go.mod:/go/src/server/go.mod
-      - ./api/go.sum:/go/src/server/go.sum
     depends_on:
       - db
 
@@ -39,26 +37,12 @@ services:
   frontend:
     build:
       context: ./frontend
-#      target: build
     volumes:
       - ./frontend/dist:/frontend/dist
       - ./frontend/src:/frontend/src
       - ./frontend/nginx/nginx.conf:/etc/nginx/nginx.conf
-#      - ./frontend/nginx/:/etc/nginx/
+      - ./frontend/nginx/logs:/var/log/nginx
     ports:
       - "80:80"
     depends_on:
       - api
-#
-
-#  nginx:
-#    build:
-#      context: ./frontend
-#      target: nginx
-#    ports:
-#      - "80:80"
-#    depends_on:
-#      - api
-#      - frontend
-#    volumes:
-#      - ./frontend/dist:/usr/share/nginx/html/

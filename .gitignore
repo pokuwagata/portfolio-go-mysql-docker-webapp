@@ -7,3 +7,4 @@
 /api/logs/*
 /docs/api-example.yaml
 /api/requestSample/
+frontend/nginx/logs/*
