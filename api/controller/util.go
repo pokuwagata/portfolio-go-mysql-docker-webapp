@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/labstack/echo"
 	"strings"
+	"api/model"
 )
 
 func GetTokenFromHeader(c echo.Context) (string, error) {
@@ -20,4 +21,8 @@ func GetTokenFromHeader(c echo.Context) (string, error) {
 	// 半角空白の除去（rawTokenの先頭に半角空白が入るため）
 	token := strings.Join(strings.Fields(rawToken[1]), "")
 	return token, nil
+}
+
+func GetErrorResponse(c echo.Context, status int, message string) error {
+	return c.JSON(status, model.ErrorResponse{Code: status, Message: message})
 }

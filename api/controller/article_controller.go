@@ -26,11 +26,11 @@ func (ac *ArticleController) Create(c echo.Context) error {
 	a := &model.Article{}
 
 	if err := c.Bind(a); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	if err := c.Validate(a); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
@@ -40,11 +40,11 @@ func (ac *ArticleController) Create(c echo.Context) error {
 
 	token, err := GetTokenFromHeader(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	if err := ac.au.Create(ctx, a, token); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, "success")
@@ -56,18 +56,18 @@ func (ac *ArticleController) Update(c echo.Context) error {
 
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	a := &model.Article{}
 	a.ID = id
 
 	if err := c.Bind(a); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	if err := c.Validate(a); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
@@ -77,11 +77,11 @@ func (ac *ArticleController) Update(c echo.Context) error {
 
 	token, err := GetTokenFromHeader(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	if err := ac.au.Update(ctx, a, token); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, "success")
@@ -93,7 +93,7 @@ func (ac *ArticleController) GetById(c echo.Context) error {
 
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
@@ -103,7 +103,7 @@ func (ac *ArticleController) GetById(c echo.Context) error {
 
 	article, err := ac.au.GetById(ctx, id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, article)
@@ -117,24 +117,24 @@ func (ac *ArticleController) GetList(c echo.Context) error {
 	if n > 1 {
 		articles, err := ac.getByPageNumber(c, n)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+			return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 		}
 
 		return c.JSON(http.StatusOK, model.GetListResponse{Articles: articles})
 	} else if n == 1 {
 		max, err := ac.getMaxPageNumber(c)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+			return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 		}
 
 		articles, err := ac.getByPageNumber(c, n)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+			return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 		}
 
 		return c.JSON(http.StatusOK, model.FirstGetListResponse{Articles: articles, Max: max})
 	} else {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: constant.ERR_INVALID_REQUEST_PARAM})
+		return GetErrorResponse(c, http.StatusBadRequest, constant.ERR_INVALID_REQUEST_PARAM)
 	}
 }
 
@@ -146,24 +146,25 @@ func (ac *ArticleController) GetListByUser(c echo.Context) error {
 	if n > 1 {
 		articles, err := ac.getByUserAndPageNumber(c, n)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+			return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 		}
 
 		return c.JSON(http.StatusOK, model.GetListResponse{Articles: articles})
 	} else if n == 1 {
 		max, err := ac.getMaxPageNumberByUser(c)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+			return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 		}
 
 		articles, err := ac.getByUserAndPageNumber(c, n)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+			return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 		}
 
 		return c.JSON(http.StatusOK, model.FirstGetListResponse{Articles: articles, Max: max})
 	} else {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: constant.ERR_INVALID_REQUEST_PARAM})
+		// TODO: エラーログ
+		return GetErrorResponse(c, http.StatusBadRequest, constant.ERR_INVALID_REQUEST_PARAM)
 	}
 }
 
@@ -240,7 +241,7 @@ func (ac *ArticleController) Delete(c echo.Context) error {
 	// TODO: pathParameterに変更
 	id, err := strconv.ParseInt(c.QueryParam("id"), 10, 64)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
@@ -251,13 +252,13 @@ func (ac *ArticleController) Delete(c echo.Context) error {
 	token, err := GetTokenFromHeader(c)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	// TODO: idを返す必要ある？
 	_, err = ac.au.Delete(ctx, id, token)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, "success")
