@@ -6,7 +6,10 @@ const (
 	PUBLISHED = "公開"
 	REMOVED = "削除"
 	ARTICLES_PER_PAGE = 5
+
+	SUCCESS_MESSAGE = "OK"
 	ERR_INVALID_REQUEST_PARAM = "リクエストパラメータが不正です"
+
 
 	LOG_INFO int = iota
 	LOG_ERROR

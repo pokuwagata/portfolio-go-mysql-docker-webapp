@@ -47,7 +47,7 @@ func (ac *ArticleController) Create(c echo.Context) error {
 		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, "success")
+	return c.JSON(http.StatusCreated, constant.SUCCESS_MESSAGE)
 }
 
 func (ac *ArticleController) Update(c echo.Context) error {
@@ -84,7 +84,7 @@ func (ac *ArticleController) Update(c echo.Context) error {
 		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, "success")
+	return c.JSON(http.StatusOK, constant.SUCCESS_MESSAGE)
 }
 
 func (ac *ArticleController) GetById(c echo.Context) error {
@@ -261,5 +261,5 @@ func (ac *ArticleController) Delete(c echo.Context) error {
 		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, "success")
+	return c.JSON(http.StatusCreated, constant.SUCCESS_MESSAGE)
 }
