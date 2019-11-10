@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"strings"
 	"api/model"
 	"api/usecase"
 	"context"
@@ -19,6 +20,9 @@ func NewArticleController(au usecase.ArticleUsecaseInterface) *ArticleController
 }
 
 func (ac *ArticleController) Create(c echo.Context) error {
+	c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_BEGIN, "ArticleController.Create"}, constant.LOG_SEPARATOR))
+	defer c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_END, "ArticleController.Create"}, constant.LOG_SEPARATOR))
+
 	a := &model.Article{}
 
 	if err := c.Bind(a); err != nil {
@@ -47,6 +51,9 @@ func (ac *ArticleController) Create(c echo.Context) error {
 }
 
 func (ac *ArticleController) Update(c echo.Context) error {
+	c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_BEGIN, "ArticleController.Update"}, constant.LOG_SEPARATOR))
+	defer c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_END, "ArticleController.Update"}, constant.LOG_SEPARATOR))
+
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
@@ -81,6 +88,9 @@ func (ac *ArticleController) Update(c echo.Context) error {
 }
 
 func (ac *ArticleController) GetById(c echo.Context) error {
+	c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_BEGIN, "ArticleController.GetById"}, constant.LOG_SEPARATOR))
+	defer c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_END, "ArticleController.GetById"}, constant.LOG_SEPARATOR))
+
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
@@ -100,6 +110,9 @@ func (ac *ArticleController) GetById(c echo.Context) error {
 }
 
 func (ac *ArticleController) GetList(c echo.Context) error {
+	c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_BEGIN, "ArticleController.GetList"}, constant.LOG_SEPARATOR))
+	defer c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_END, "ArticleController.GetList"}, constant.LOG_SEPARATOR))
+
 	n, _ := strconv.Atoi(c.QueryParam("number"))
 	if n > 1 {
 		articles, err := ac.getByPageNumber(c, n)
@@ -126,6 +139,9 @@ func (ac *ArticleController) GetList(c echo.Context) error {
 }
 
 func (ac *ArticleController) GetListByUser(c echo.Context) error {
+	c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_BEGIN, "ArticleController.GetListByUser"}, constant.LOG_SEPARATOR))
+	defer c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_END, "ArticleController.GetListByUser"}, constant.LOG_SEPARATOR))
+
 	n, _ := strconv.Atoi(c.QueryParam("number"))
 	if n > 1 {
 		articles, err := ac.getByUserAndPageNumber(c, n)
@@ -218,6 +234,9 @@ func (ac *ArticleController) getMaxPageNumberByUser(c echo.Context) (int, error)
 }
 
 func (ac *ArticleController) Delete(c echo.Context) error {
+	c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_BEGIN, "ArticleController.Delete"}, constant.LOG_SEPARATOR))
+	defer c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_END, "ArticleController.Delete"}, constant.LOG_SEPARATOR))
+
 	// TODO: pathParameterに変更
 	id, err := strconv.ParseInt(c.QueryParam("id"), 10, 64)
 	if err != nil {
