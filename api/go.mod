@@ -11,6 +11,8 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/leodido/go-urn v1.1.0 // indirect
+	github.com/pkg/errors v0.8.1
+	github.com/shogo82148/go-sql-proxy v0.1.1
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472
 	gopkg.in/go-playground/validator.v9 v9.29.1

@@ -19,7 +19,10 @@ func main() {
 	e := echo.New()
 	logger.Init(e)
 	db := database.NewDB(e)
-	defer db.Close()
+	defer func() {
+		e.Logger.Info("Close MySQL")
+		db.Close()
+	}()
 	validater.Init(e)
 
 	ur := repository.NewUserRepository(db)
