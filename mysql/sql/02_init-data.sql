@@ -1,3 +1,6 @@
+SET CHARACTER_SET_CLIENT = utf8;
+SET CHARACTER_SET_CONNECTION = utf8;
+
 INSERT INTO
   `sample_db`.`article_statuses` (`status`)
 VALUES
