@@ -192,46 +192,70 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int) ([]mode
 	// (idが初期データの投入順に依存するため変更時は修正が必要)
 	artStaId := 1
 
-	if n == 1 {
-		atcQuery := `SELECT id, title, content, updated_at, (SELECT username FROM users WHERE id = articles.user_id) ` +
-			`FROM articles ` +
-			`WHERE article_status_id = ? ` +
-			`ORDER BY updated_at DESC LIMIT ?`
+	base := []string{
+		"SELECT",
+			"id,",
+			"title,",
+			"content,",
+			"updated_at,",
+			"(",
+				"SELECT",
+					"username",
+				"FROM users",
+				"WHERE",
+					"id = articles.user_id",
+			")",
+		"FROM articles",
+	}
 
-		stmt, err := ar.db.PrepareContext(ctx, atcQuery)
-		if err != nil {
-			return nil, err
-		}
+	where := []string{
+		"WHERE",
+			"article_status_id = ?",
+	}
 
-		rows, err = stmt.QueryContext(ctx, artStaId, constant.ARTICLES_PER_PAGE)
-		if err != nil {
-			return nil, err
-		}
+	order := []string{
+		"ORDER BY",
+			"updated_at DESC",
+	}
 
-	} else {
-		// updated_atが同一のレコードは存在しない想定
-		// paging indexを利用(user_id, article_status_id, updated_at DESC)
-		atcQuery :=
-			`SELECT id, title, content, updated_at, (SELECT username FROM users WHERE id = articles.user_id) ` +
-				`FROM articles ` +
-				`WHERE article_status_id = ? ` +
-				`AND updated_at < ` +
-				`(SELECT updated_at FROM articles WHERE 
-						article_status_id = ? ` +
-				`ORDER BY updated_at DESC LIMIT 1 OFFSET ?) ` +
-				`ORDER BY updated_at DESC LIMIT ?`
+	limit := []string{
+		"LIMIT",
+			"?",
+	}
 
-		stmt, err := ar.db.PrepareContext(ctx, atcQuery)
-		if err != nil {
-			return nil, err
-		}
+	args := []interface{}{artStaId, constant.ARTICLES_PER_PAGE}
+
+	if n > 1 {
+		where = append(where, []string{
+			"AND updated_at < (",
+			"SELECT",
+				"updated_at",
+			"FROM articles",
+			"WHERE",
+				"article_status_id = ?",
+			"ORDER BY",
+				"updated_at DESC",
+			"LIMIT",
+				"1 OFFSET ?",
+		")",
+		}...)
 
 		offset := constant.ARTICLES_PER_PAGE*(n-1) - 1
 
-		rows, err = stmt.QueryContext(ctx, artStaId, artStaId, offset, constant.ARTICLES_PER_PAGE)
-		if err != nil {
-			return nil, err
-		}
+		args = []interface{}{artStaId, artStaId, offset, constant.ARTICLES_PER_PAGE}
+	}
+
+	query := append(base, where...)
+	query = append(query, order...)
+	query = append(query, limit...)
+	
+	rawQuery := strings.Join(query, constant.HALF_SPACE);
+
+	rows, err := ar.db.QueryContext(ctx, rawQuery, args...)
+	if err != nil {
+		ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
+		ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
+		return nil, err
 	}
 
 	var articles []model.ViewArticle
@@ -241,7 +265,10 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int) ([]mode
 		_ = rows.Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt, &a.Username)
 		articles = append(articles, a)
 	} else {
-		return nil, errors.New("article not found")
+		err := errors.New(constant.ERR_ARTICLE_NOT_FOUND)
+		ar.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
+		ar.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
+		return nil, err
 	}
 
 	for rows.Next() {
