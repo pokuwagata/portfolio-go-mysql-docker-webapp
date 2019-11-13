@@ -5,15 +5,18 @@ import (
 	"api/model"
 	"context"
 	"database/sql"
-	"errors"
+	"github.com/pkg/errors"
+	"strings"
+	"github.com/labstack/echo"
 )
 
 type ArticleRepository struct {
 	db *sql.DB
+	e *echo.Echo
 }
 
-func NewArticleRepository(db *sql.DB) *ArticleRepository {
-	return &ArticleRepository{db}
+func NewArticleRepository(db *sql.DB, e *echo.Echo) *ArticleRepository {
+	return &ArticleRepository{db, e}
 }
 
 func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error {
@@ -122,25 +125,26 @@ func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.View
 }
 
 func (ar *ArticleRepository) GetArticleCount(ctx context.Context) (int, error) {
-	query := 
-		`
-		SELECT
-			count(id)
-		FROM
-			articles
-		WHERE
-			article_status_id = (
-				SELECT
-					id
-				FROM
-					article_statuses
-				WHERE
-					status = ?
-			)
-		`
+	query := strings.Join([]string{
+		"SELECT",
+			"count(id)",
+		"FROM",
+			"articles",
+		"WHERE",
+			"article_status_id = (",
+				"SELECT",
+					"id",
+				"FROM",
+					"article_statuses",
+				"WHERE",
+					"status = ?",
+				")",
+		}, constant.HALF_SPACE)
 
 	var count int
 	if err := ar.db.QueryRowContext(ctx, query, constant.PUBLISHED).Scan(&count); err != nil {
+		ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
+		ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
 		return 0, err
 	}
 

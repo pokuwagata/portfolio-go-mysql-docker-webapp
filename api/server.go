@@ -26,7 +26,7 @@ func main() {
 	validater.Init(e)
 
 	ur := repository.NewUserRepository(db)
-	ar := repository.NewArticleRepository(db)
+	ar := repository.NewArticleRepository(db, e)
 	uu := usecase.NewUserUsecase(ur)
 	su := usecase.NewSessionUsecase(ur)
 	au := usecase.NewArticleUsecase(ar, ur, su)

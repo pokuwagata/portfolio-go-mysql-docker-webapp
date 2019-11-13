@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"api/constant"
+	"github.com/pkg/errors"
 )
 
 type ArticleController struct {
@@ -134,7 +135,9 @@ func (ac *ArticleController) GetList(c echo.Context) error {
 
 		return c.JSON(http.StatusOK, model.FirstGetListResponse{Articles: articles, Max: max})
 	} else {
-		return GetErrorResponse(c, http.StatusBadRequest, constant.ERR_INVALID_REQUEST_PARAM)
+		err := errors.WithStack(errors.New(constant.ERR_INVALID_REQUEST_PARAM))
+		c.Logger().Errorf("%+v", err)
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 }
 
