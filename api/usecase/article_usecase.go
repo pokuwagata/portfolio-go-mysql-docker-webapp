@@ -103,7 +103,7 @@ func (au *ArticleUsecase) GetMaxPageNumberByUser(ctx context.Context, token stri
 		return 0, err
 	}
 
-	cnt, err := au.ar.GetArticleCount(ctx, map[string]string{constant.USER_ID_COLUMN : strconv.Itoa(userId)})
+	cnt, err := au.ar.GetArticleCount(ctx, map[string]string{constant.USER_ID_COLUMN: strconv.Itoa(userId)})
 	if err != nil {
 		return 0, err
 	}
@@ -136,7 +136,7 @@ func (au *ArticleUsecase) GetByUserAndPageNumber(ctx context.Context, number int
 		return nil, err
 	}
 
-	articles, err := au.ar.GetByPageNumber(ctx, number, map[string]string{constant.USER_ID_COLUMN : strconv.Itoa(userId)})
+	articles, err := au.ar.GetByPageNumber(ctx, number, map[string]string{constant.USER_ID_COLUMN: strconv.Itoa(userId)})
 	if err != nil {
 		return nil, err
 	}

@@ -5,9 +5,9 @@ import (
 	"api/model"
 	"context"
 	"database/sql"
+	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 	"strings"
-	"github.com/labstack/echo"
 )
 
 type ArticleRepository struct {
