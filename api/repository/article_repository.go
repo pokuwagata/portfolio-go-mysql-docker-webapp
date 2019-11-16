@@ -124,12 +124,17 @@ func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.View
 	return &a, nil
 }
 
-func (ar *ArticleRepository) GetArticleCount(ctx context.Context) (int, error) {
-	query := strings.Join([]string{
+func (ar *ArticleRepository) GetArticleCount(ctx context.Context, searchParams map[string]string) (int, error) {
+	args := []interface{}{constant.PUBLISHED}
+
+	base := []string{
 		"SELECT",
 			"count(id)",
 		"FROM",
 			"articles",
+		}
+
+	where := []string{
 		"WHERE",
 			"article_status_id = (",
 				"SELECT",
@@ -139,47 +144,23 @@ func (ar *ArticleRepository) GetArticleCount(ctx context.Context) (int, error) {
 				"WHERE",
 					"status = ?",
 				")",
-		}, constant.HALF_SPACE)
-
-	var count int
-	if err := ar.db.QueryRowContext(ctx, query, constant.PUBLISHED).Scan(&count); err != nil {
-		ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
-		ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
-		return 0, err
+		}
+		
+	for key, value := range searchParams {
+		where = append(where, []string{
+			"AND",
+				key + " " + "=" + " " + "?",
+		}...)
+		args = append(args, value)
 	}
 
-	return count, nil
-}
-
-func (ar *ArticleRepository) GetArticleCountByUser(ctx context.Context, name string) (int, error) {
-	// TODO: GetArticleCountとの共通化
-	query := 
-		`
-		SELECT
-			count(id)
-		FROM
-			articles
-		WHERE
-			user_id = (
-				select
-					id
-				from
-					users
-				where
-					username = ?
-			)
-			AND article_status_id = (
-				SELECT
-					id
-				FROM
-					article_statuses
-				WHERE
-					status = ?
-			)
-		`
+	query := append(base, where...)
+	rawQuery := strings.Join(query, constant.HALF_SPACE)
 
 	var count int
-	if err := ar.db.QueryRowContext(ctx, query, name, constant.PUBLISHED).Scan(&count); err != nil {
+	if err := ar.db.QueryRowContext(ctx, rawQuery, args...).Scan(&count); err != nil {
+		ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
+		ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
 		return 0, err
 	}
 
@@ -193,6 +174,8 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int, searchP
 	if err != nil {
 		return nil, err
 	}
+
+	args := []interface{}{artStaId}
 
 	base := []string{
 		"SELECT",
@@ -215,19 +198,6 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int, searchP
 			"article_status_id = ?",
 	}
 
-
-	order := []string{
-		"ORDER BY",
-			"updated_at DESC",
-	}
-
-	limit := []string{
-		"LIMIT",
-			"?",
-	}
-
-	args := []interface{}{artStaId, constant.ARTICLES_PER_PAGE}
-
 	if n > 1 {
 		where = append(where, []string{
 			"AND updated_at < (",
@@ -245,18 +215,30 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int, searchP
 
 		offset := constant.ARTICLES_PER_PAGE*(n-1) - 1
 
-		args = []interface{}{artStaId, artStaId, offset, constant.ARTICLES_PER_PAGE}
+		args = append(args, []interface{}{artStaId, offset}...)
 	}
 
-	query := append(base, where...)
-
-	for key, _ := range searchParams {
+	for key, value := range searchParams {
 		where = append(where, []string{
 			"AND",
 				key + " " + "=" + " " + "?",
 		}...)
+		args = append(args, value)
 	}
 
+	order := []string{
+		"ORDER BY",
+			"updated_at DESC",
+	}
+
+	limit := []string{
+		"LIMIT",
+			"?",
+	}
+
+	args = append(args, constant.ARTICLES_PER_PAGE)
+
+	query := append(base, where...)
 	query = append(query, order...)
 	query = append(query, limit...)
 	

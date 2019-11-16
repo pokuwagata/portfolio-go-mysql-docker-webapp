@@ -79,7 +79,7 @@ func (au *ArticleUsecase) GetById(ctx context.Context, id int64) (*model.ViewArt
 }
 
 func (au *ArticleUsecase) GetMaxPageNumber(ctx context.Context) (int, error) {
-	cnt, err := au.ar.GetArticleCount(ctx)
+	cnt, err := au.ar.GetArticleCount(ctx, nil)
 	if err != nil {
 		return 0, err
 	}
@@ -93,14 +93,17 @@ func (au *ArticleUsecase) GetMaxPageNumber(ctx context.Context) (int, error) {
 }
 
 func (au *ArticleUsecase) GetMaxPageNumberByUser(ctx context.Context, token string) (int, error) {
-	// TODO: GetMaxPageNumberとの共通化
-	// tokenから投稿者を設定
 	name, err := au.su.GetUsernameFromToken(token)
 	if err != nil {
 		return 0, err
 	}
 
-	cnt, err := au.ar.GetArticleCountByUser(ctx, name)
+	userId, err := au.ur.GetIdByUsername(ctx, name)
+	if err != nil {
+		return 0, err
+	}
+
+	cnt, err := au.ar.GetArticleCount(ctx, map[string]string{constant.USER_ID_COLUMN : strconv.Itoa(userId)})
 	if err != nil {
 		return 0, err
 	}

@@ -41,17 +41,8 @@ func (au *ArticleRepositoryMock) GetById(ctx context.Context, id int64) (*model.
 	}
 }
 
-func (au *ArticleRepositoryMock) GetArticleCount(ctx context.Context) (int, error) {
+func (au *ArticleRepositoryMock) GetArticleCount(ctx context.Context, searchParams map[string]string) (int, error) {
 	args := au.Called(ctx)
-	if args.Get(0) != 0 {
-		return args.Int(0), nil
-	} else {
-		return 0, args.Error(1)
-	}
-}
-
-func (au *ArticleRepositoryMock) GetArticleCountByUser(ctx context.Context, name string) (int, error) {
-	args := au.Called(ctx, name)
 	if args.Get(0) != 0 {
 		return args.Int(0), nil
 	} else {
