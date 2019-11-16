@@ -20,31 +20,35 @@ func NewArticleRepository(db *sql.DB, e *echo.Echo) *ArticleRepository {
 }
 
 func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error {
-	query :=
-		`INSERT
-			articles
-		SET
-			title = ?,
-			content = ?,
-			user_id =(
-				SELECT
-					id
-				FROM
-					users
-				WHERE
-					username = ?
-			),
-			article_status_id =(
-				SELECT
-					id
-				FROM
-					article_statuses
-				WHERE
-					status = ?
-			)`
+	query := []string {
+		"INSERT",
+			"articles",
+		"SET",
+			"title = ?,",
+			"content = ?,",
+			"user_id =(",
+				"SELECT",
+					"id",
+				"FROM",
+					"users",
+				"WHERE",
+					"username = ?",
+			"),",
+			"article_status_id =(",
+				"SELECT",
+					"id",
+				"FROM",
+					"article_statuses",
+				"WHERE",
+					"status = ?",
+			")",
+	}
+	rawQuery := strings.Join(query, constant.HALF_SPACE)
 
 	if _, err := ar.db.ExecContext(
-		ctx, query, a.Title, a.Content, a.Username, a.ArticleStatus); err != nil {
+		ctx, rawQuery, a.Title, a.Content, a.Username, a.ArticleStatus); err != nil {
+			ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
+			ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
 		return err
 	}
 
@@ -52,33 +56,37 @@ func (ar *ArticleRepository) Store(ctx context.Context, a *model.Article) error 
 }
 
 func (ar *ArticleRepository) Update(ctx context.Context, a *model.Article) error {
-	query :=
-		`
-		UPDATE
-			articles
-		SET
-			title = ?,
-			content = ?,
-			user_id =(
-				SELECT
-					id
-				FROM
-					users
-				WHERE
-					username = ?
-			),
-			article_status_id =(
-				SELECT
-					id
-				FROM
-					article_statuses
-				WHERE
-					status = ?
-			)
-		WHERE
-			id = ?
-	`
-	if _, err := ar.db.ExecContext(ctx, query, a.Title, a.Content, a.Username, constant.PUBLISHED, a.ID); err != nil {
+	query := []string {
+		"UPDATE",
+			"articles",
+		"SET",
+			"title = ?,",
+			"content = ?,",
+			"user_id =(",
+				"SELECT",
+					"id",
+				"FROM",
+					"users",
+				"WHERE",
+					"username = ?",
+			"),",
+			"article_status_id =(",
+				"SELECT",
+					"id",
+				"FROM",
+					"article_statuses",
+				"WHERE",
+					"status = ?",
+			")",
+		"WHERE",
+			"id = ?",
+	}
+
+	rawQuery := strings.Join(query, constant.HALF_SPACE)
+
+	if _, err := ar.db.ExecContext(ctx, rawQuery, a.Title, a.Content, a.Username, constant.PUBLISHED, a.ID); err != nil {
+			ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
+			ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
 		return err
 	}
 
@@ -86,37 +94,38 @@ func (ar *ArticleRepository) Update(ctx context.Context, a *model.Article) error
 }
 
 func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.ViewArticle, error) {
-	query := 
-		`
-		SELECT
-			id,
-			title,
-			content,
-			updated_at,
-			(
-				SELECT
-					username
-				FROM
-					users
-				WHERE
-					id = articles.user_id
-			) 
-		FROM
-			articles
-		WHERE
-			ID = ?
-			AND article_status_id =(
-				SELECT
-					id
-				FROM
-					article_statuses
-				WHERE
-					status = ?
-			)
-		`
+	query := []string{
+		"SELECT",
+			"id,",
+			"title,",
+			"content,",
+			"updated_at,",
+			"(",
+				"SELECT",
+					"username",
+				"FROM",
+					"users",
+				"WHERE",
+					"id = articles.user_id",
+			") ",
+		"FROM",
+			"articles",
+		"WHERE",
+			"ID = ?",
+			"AND article_status_id =(",
+				"SELECT",
+					"id",
+				"FROM",
+					"article_statuses",
+				"WHERE",
+					"status = ?",
+			")",
+	}
+
+	rawQuery := strings.Join(query, constant.HALF_SPACE)
 
 	var a model.ViewArticle
-	if err := ar.db.QueryRowContext(ctx, query, id, constant.PUBLISHED).
+	if err := ar.db.QueryRowContext(ctx, rawQuery, id, constant.PUBLISHED).
 		Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt, &a.Username); err != nil {
 			return nil, err
 	}
