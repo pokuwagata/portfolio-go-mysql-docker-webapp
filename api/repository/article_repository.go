@@ -188,9 +188,11 @@ func (ar *ArticleRepository) GetArticleCountByUser(ctx context.Context, name str
 
 func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int, searchParams map[string]string) ([]model.ViewArticle, error) {
 	var rows *sql.Rows
-	// NOTE: index利用のため（サブクエリを使用しないため）にarticle_status_idをハードコーディング
-	// (idが初期データの投入順に依存するため変更時は修正が必要)
-	artStaId := 1
+	// NOTE: index利用のため（サブクエリを使用しないため）にクエリを分割
+	artStaId, err := ar.getArticleStatusId(ctx, constant.PUBLISHED)
+	if err != nil {
+		return nil, err
+	}
 
 	base := []string{
 		"SELECT",
@@ -260,7 +262,7 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int, searchP
 	
 	rawQuery := strings.Join(query, constant.HALF_SPACE);
 
-	rows, err := ar.db.QueryContext(ctx, rawQuery, args...)
+	rows, err = ar.db.QueryContext(ctx, rawQuery, args...)
 	if err != nil {
 		ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
 		ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
@@ -309,4 +311,25 @@ func (ar *ArticleRepository) Delete(ctx context.Context, aId int64, un string) (
 	}
 
 	return lastId, nil
+}
+
+func (ar *ArticleRepository) getArticleStatusId(ctx context.Context, status string) (int64, error) {
+	query := []string{
+		"SELECT",
+			"id",
+		"FROM",
+			"article_statuses",
+		"WHERE",
+			"status = ?",
+	}
+
+	rawQuery := strings.Join(query, constant.HALF_SPACE)
+	var id int64
+	if err:= ar.db.QueryRowContext(ctx, rawQuery, status).Scan(&id); err != nil {
+		ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
+		ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
+		return 0, err
+	}
+
+	return id, nil
 }
