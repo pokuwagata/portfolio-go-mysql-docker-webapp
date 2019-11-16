@@ -4,6 +4,7 @@ import (
 	"api/constant"
 	"api/model"
 	"context"
+	"strconv"
 )
 
 type ArticleUsecaseInterface interface {
@@ -113,7 +114,7 @@ func (au *ArticleUsecase) GetMaxPageNumberByUser(ctx context.Context, token stri
 }
 
 func (au *ArticleUsecase) GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error) {
-	articles, err := au.ar.GetByPageNumber(ctx, n)
+	articles, err := au.ar.GetByPageNumber(ctx, n, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -121,14 +122,18 @@ func (au *ArticleUsecase) GetByPageNumber(ctx context.Context, n int) ([]model.V
 	return articles, nil
 }
 
-func (au *ArticleUsecase) GetByUserAndPageNumber(ctx context.Context, n int, t string) ([]model.ViewArticle, error) {
-	// tokenから投稿者を設定
-	un, err := au.su.GetUsernameFromToken(t)
+func (au *ArticleUsecase) GetByUserAndPageNumber(ctx context.Context, number int, t string) ([]model.ViewArticle, error) {
+	name, err := au.su.GetUsernameFromToken(t)
 	if err != nil {
 		return nil, err
 	}
 
-	articles, err := au.ar.GetByUserAndPageNumber(ctx, un, n)
+	userId, err := au.ur.GetIdByUsername(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	articles, err := au.ar.GetByPageNumber(ctx, number, map[string]string{constant.USER_ID_COLUMN : strconv.Itoa(userId)})
 	if err != nil {
 		return nil, err
 	}

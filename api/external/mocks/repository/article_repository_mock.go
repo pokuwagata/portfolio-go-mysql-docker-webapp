@@ -59,11 +59,7 @@ func (au *ArticleRepositoryMock) GetArticleCountByUser(ctx context.Context, name
 	}
 }
 
-func (au *ArticleRepositoryMock) GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error) {
-	return nil, nil
-}
-
-func (au *ArticleRepositoryMock) GetByUserAndPageNumber(ctx context.Context, un string, n int) ([]model.ViewArticle, error) {
+func (au *ArticleRepositoryMock) GetByPageNumber(ctx context.Context, n int, searchParams map[string]string) ([]model.ViewArticle, error) {
 	return nil, nil
 }
 

@@ -186,7 +186,7 @@ func (ar *ArticleRepository) GetArticleCountByUser(ctx context.Context, name str
 	return count, nil
 }
 
-func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error) {
+func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int, searchParams map[string]string) ([]model.ViewArticle, error) {
 	var rows *sql.Rows
 	// NOTE: index利用のため（サブクエリを使用しないため）にarticle_status_idをハードコーディング
 	// (idが初期データの投入順に依存するため変更時は修正が必要)
@@ -212,6 +212,7 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int) ([]mode
 		"WHERE",
 			"article_status_id = ?",
 	}
+
 
 	order := []string{
 		"ORDER BY",
@@ -246,6 +247,14 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int) ([]mode
 	}
 
 	query := append(base, where...)
+
+	for key, _ := range searchParams {
+		where = append(where, []string{
+			"AND",
+				key + " " + "=" + " " + "?",
+		}...)
+	}
+
 	query = append(query, order...)
 	query = append(query, limit...)
 	
@@ -274,84 +283,6 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int) ([]mode
 	for rows.Next() {
 		var a model.ViewArticle
 		_ = rows.Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt, &a.Username)
-		articles = append(articles, a)
-	}
-
-	return articles, nil
-}
-
-func (ar *ArticleRepository) GetByUserAndPageNumber(ctx context.Context, un string, n int) ([]model.ViewArticle, error) {
-	uidQuery := `SELECT id FROM users WHERE username = ?`
-	stmt, err := ar.db.PrepareContext(ctx, uidQuery)
-	if err != nil {
-		return nil, err
-	}
-	var uid int
-	if err := stmt.QueryRowContext(ctx, un).Scan(&uid); err != nil {
-		return nil, errors.New("user not found")
-	}
-
-	var rows *sql.Rows
-	// NOTE: index利用のため（サブクエリを使用しないため）に直接指定
-	// idが初期データの投入順に依存するため変更時は修正が必要
-	artStaId := 1
-
-	if n == 1 {
-		atcQuery := `SELECT id, title, content, updated_at FROM articles ` +
-			`WHERE user_id = ? AND article_status_id = ? ` +
-			`ORDER BY updated_at DESC LIMIT ?`
-
-		stmt, err = ar.db.PrepareContext(ctx, atcQuery)
-		if err != nil {
-			return nil, err
-		}
-
-		rows, err = stmt.QueryContext(ctx, uid, artStaId, constant.ARTICLES_PER_PAGE)
-		if err != nil {
-			return nil, err
-		}
-
-	} else {
-		// updated_atが同一のレコードは存在しない想定
-		// paging indexを利用(user_id, article_status_id, updated_at DESC)
-		atcQuery :=
-			`SELECT id, title, content, updated_at FROM articles WHERE ` +
-				`user_id = ? ` +
-				`AND article_status_id = ? ` +
-				`AND updated_at < ` +
-				`(SELECT updated_at FROM articles WHERE 
-						user_id = ? AND article_status_id = ? ` +
-				`ORDER BY updated_at DESC LIMIT 1 OFFSET ?) ` +
-				`ORDER BY updated_at DESC LIMIT ?`
-
-		stmt, err = ar.db.PrepareContext(ctx, atcQuery)
-		if err != nil {
-			return nil, err
-		}
-
-		offset := constant.ARTICLES_PER_PAGE*(n-1) - 1
-
-		rows, err = stmt.QueryContext(ctx, uid, artStaId, uid, artStaId, offset, constant.ARTICLES_PER_PAGE)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	var articles []model.ViewArticle
-
-	if rows.Next() {
-		var a model.ViewArticle
-		// FIXME: エラーハンドリング
-		err = rows.Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt)
-		articles = append(articles, a)
-	} else {
-		return nil, errors.New("article not found")
-	}
-
-	for rows.Next() {
-		var a model.ViewArticle
-		// FIXME: エラーハンドリング
-		err = rows.Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt)
 		articles = append(articles, a)
 	}
 

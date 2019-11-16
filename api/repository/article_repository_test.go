@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 	"time"
+	"github.com/labstack/echo"
 )
 
 func TestStore(t *testing.T) {
@@ -44,7 +45,7 @@ func TestStore(t *testing.T) {
 		WithArgs("タイトル", "コンテンツ", "テストユーザ", constant.PUBLISHED).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	ar := NewArticleRepository(db)
+	ar := NewArticleRepository(db, echo.New())
 	article := model.Article{Title: "タイトル", Content: "コンテンツ", Username: "テストユーザ", ArticleStatus: constant.PUBLISHED}
 	if err := ar.Store(context.TODO(), &article); err != nil {
 		t.Errorf("error was not expected : %s", err)
@@ -92,7 +93,7 @@ func TestUpdate(t *testing.T) {
 		WithArgs("タイトル", "コンテンツ", "テストユーザ", constant.PUBLISHED, int64(1)).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	ar := NewArticleRepository(db)
+	ar := NewArticleRepository(db, echo.New())
 	article := model.Article{ID: int64(1), Title: "タイトル", Content: "コンテンツ", Username: "テストユーザ", ArticleStatus: constant.PUBLISHED}
 	if err := ar.Update(context.TODO(), &article); err != nil {
 		t.Errorf("error was not expected : %s", err)
@@ -146,7 +147,7 @@ func TestGetById(t *testing.T) {
 		WithArgs(int64(1), constant.PUBLISHED).
 		WillReturnRows(row)
 
-	ar := NewArticleRepository(db)
+	ar := NewArticleRepository(db, echo.New())
 	if _, err := ar.GetById(context.TODO(), int64(1)); err != nil {
 		t.Errorf("error was not expected : %s", err)
 	}
@@ -186,7 +187,7 @@ func TestArticleCount(t *testing.T) {
 		WithArgs(constant.PUBLISHED).
 		WillReturnRows(row)
 
-	ar := NewArticleRepository(db)
+	ar := NewArticleRepository(db, echo.New())
 	if _, err := ar.GetArticleCount(context.TODO()); err != nil {
 		t.Errorf("error was not expected : %s", err)
 	}
@@ -234,7 +235,7 @@ func TestArticleCountByUser(t *testing.T) {
 		WithArgs(name, constant.PUBLISHED).
 		WillReturnRows(row)
 
-	ar := NewArticleRepository(db)
+	ar := NewArticleRepository(db, echo.New())
 	if _, err := ar.GetArticleCountByUser(context.TODO(), name); err != nil {
 		t.Errorf("error was not expected : %s", err)
 	}
@@ -260,7 +261,7 @@ func TestGetByPageNumber(t *testing.T) {
 		WithArgs(int64(1), constant.PUBLISHED).
 		WillReturnRows(row)
 
-	ar := NewArticleRepository(db)
+	ar := NewArticleRepository(db, echo.New())
 	if _, err := ar.GetById(context.TODO(), int64(1)); err != nil {
 		t.Errorf("error was not expected : %s", err)
 	}

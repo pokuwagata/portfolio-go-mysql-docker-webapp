@@ -11,7 +11,6 @@ type ArticleRepository interface {
 	GetById(ctx context.Context, id int64) (*model.ViewArticle, error)
 	GetArticleCount(ctx context.Context) (int, error)
 	GetArticleCountByUser(ctx context.Context, name string) (int, error)
-	GetByPageNumber(ctx context.Context, n int) ([]model.ViewArticle, error)
-	GetByUserAndPageNumber(ctx context.Context, un string, n int) ([]model.ViewArticle, error)
+	GetByPageNumber(ctx context.Context, n int, searchParams map[string]string) ([]model.ViewArticle, error)
 	Delete(ctx context.Context, aId int64, un string) (int64, error)
 }
