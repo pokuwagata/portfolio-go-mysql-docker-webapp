@@ -54,6 +54,6 @@ func (au *ArticleRepositoryMock) GetByPageNumber(ctx context.Context, n int, sea
 	return nil, nil
 }
 
-func (au *ArticleRepositoryMock) Delete(ctx context.Context, aId int64, un string) (int64, error) {
+func (au *ArticleRepositoryMock) Delete(ctx context.Context, articleId int64, name string) (int64, error) {
 	return 0, nil
 }

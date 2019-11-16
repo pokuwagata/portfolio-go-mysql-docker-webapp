@@ -127,6 +127,8 @@ func (ar *ArticleRepository) GetById(ctx context.Context, id int64) (*model.View
 	var a model.ViewArticle
 	if err := ar.db.QueryRowContext(ctx, rawQuery, id, constant.PUBLISHED).
 		Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt, &a.Username); err != nil {
+			ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
+			ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
 			return nil, err
 	}
 
@@ -282,17 +284,34 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int, searchP
 	return articles, nil
 }
 
-func (ar *ArticleRepository) Delete(ctx context.Context, aId int64, un string) (int64, error) {
-	query := `UPDATE articles SET article_status_id = (SELECT id FROM article_statuses WHERE status = ?) ` +
-		`WHERE id = ? AND user_id = (SELECT id FROM users WHERE username = ?)`
-
-	stmt, err := ar.db.PrepareContext(ctx, query)
-	if err != nil {
-		return 0, err
+func (ar *ArticleRepository) Delete(ctx context.Context, articleId int64, name string) (int64, error) {
+	query := []string{
+		"UPDATE articles",
+		"SET",
+			"article_status_id = (",
+				"SELECT",
+					"id",
+				"FROM article_statuses",
+				"WHERE",
+					"status = ?",
+			")",
+		"WHERE",
+			"id = ?",
+			"AND user_id = (",
+				"SELECT",
+					"id",
+				"FROM users",
+				"WHERE",
+					"username = ?",
+			")",
 	}
 
-	res, err := stmt.ExecContext(ctx, constant.REMOVED, aId, un)
+	rawQuery := strings.Join(query, constant.HALF_SPACE);
+
+	res, err := ar.db.ExecContext(ctx, rawQuery, constant.REMOVED, articleId, name)
 	if err != nil {
+		ar.e.Logger.Errorf(constant.ERR_SQL_MESSAGE, err)
+		ar.e.Logger.Debugf(constant.ERR_SQL_MESSAGE_DEBUG, errors.WithStack(err))
 		return 0, err
 	}
 
