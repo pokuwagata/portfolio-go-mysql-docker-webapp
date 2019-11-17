@@ -1,12 +1,14 @@
 package usecase
 
 import (
+	"api/constant"
 	"api/external/jwtauth"
 	"api/model"
 	"api/repository"
 	"context"
-	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -18,10 +20,11 @@ type SessionUsecaseInterface interface {
 
 type SessionUsecase struct {
 	ur *repository.UserRepository
+	e  *echo.Echo
 }
 
-func NewSessionUsecase(ur *repository.UserRepository) *SessionUsecase {
-	return &SessionUsecase{ur}
+func NewSessionUsecase(ur *repository.UserRepository, e *echo.Echo) *SessionUsecase {
+	return &SessionUsecase{ur, e}
 }
 
 func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (string, error) {
@@ -30,7 +33,9 @@ func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (
 		return "", err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(s.Password)); err != nil {
-		return "", errors.New("password is incorecct")
+		su.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
+		su.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
+		return "", errors.New(constant.ERR_INVALID_PASSWORD)
 	}
 
 	claims := &jwtauth.JwtCustomClaims{
@@ -56,12 +61,16 @@ func (su *SessionUsecase) GetUsernameFromToken(clientToken string) (string, erro
 		return []byte(jwtauth.SECRET_KEY), nil
 	})
 	if err != nil {
+		su.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
+		su.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
 		return "", err
 	}
 
 	if claims, ok := token.Claims.(*jwtauth.JwtCustomClaims); ok && token.Valid {
 		return claims.Name, nil
 	} else {
-		return "", errors.New("token is invalid")
+		su.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
+		su.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
+		return "", errors.New(constant.ERR_INVALID_TOKEN)
 	}
 }

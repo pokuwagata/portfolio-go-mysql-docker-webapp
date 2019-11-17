@@ -1,13 +1,13 @@
 package controller
 
 import (
+	"api/constant"
 	"api/model"
 	"api/usecase"
 	"context"
 	"github.com/labstack/echo"
 	"net/http"
 	"strings"
-	"api/constant"
 )
 
 type SessionController struct {
