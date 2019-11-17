@@ -15,6 +15,7 @@ const (
 	ERR_USER_NOT_FOUND = "ユーザが見つかりません"
 	ERR_TOKEN_NOT_FOUND = "JWTトークンが見つかりません"
 	ERR_INVALID_TOKEN = "不正なJWTトークンです"
+	ERR_INVALID_PASSWORD = "パスワードが間違っています"
 
 	ERR_SQL_MESSAGE = LOG_ERROR_MARK + HALF_SPACE + "SQL ERROR:" + HALF_SPACE + "%s"
 	ERR_SQL_MESSAGE_DEBUG = LOG_DEBUG_MARK + HALF_SPACE + "SQL ERROR:" + HALF_SPACE + "%+v"
@@ -24,11 +25,13 @@ const (
 	LOG_INFO int = iota
 	LOG_ERROR
 
+	LOG_FILE_PATH = "logs/system.log"
 	LOG_SEPARATOR = HALF_SPACE
 	LOG_METHOD_BEGIN = "[BEGIN]"
 	LOG_METHOD_END = "[END]"
 	LOG_ERROR_MARK = "[ERROR]"
 	LOG_DEBUG_MARK = "[DEBUG]"
+	
 
 	USER_ID_COLUMN = "user_id"
 )
