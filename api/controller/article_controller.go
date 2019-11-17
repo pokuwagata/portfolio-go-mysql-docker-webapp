@@ -135,8 +135,9 @@ func (ac *ArticleController) GetList(c echo.Context) error {
 
 		return c.JSON(http.StatusOK, model.FirstGetListResponse{Articles: articles, Max: max})
 	} else {
-		err := errors.WithStack(errors.New(constant.ERR_INVALID_REQUEST_PARAM))
-		c.Logger().Errorf("%+v", err)
+		err := errors.New(constant.ERR_INVALID_REQUEST_PARAM)
+		c.Logger().Errorf(constant.ERR_APP_ERROR, err)
+		c.Logger().Debugf(constant.ERR_APP_ERROR_DEBUG, err)
 		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 }

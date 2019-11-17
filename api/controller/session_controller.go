@@ -6,6 +6,8 @@ import (
 	"context"
 	"github.com/labstack/echo"
 	"net/http"
+	"strings"
+	"api/constant"
 )
 
 type SessionController struct {
@@ -17,14 +19,17 @@ func NewSessionController(su *usecase.SessionUsecase) *SessionController {
 }
 
 func (sc *SessionController) Create(c echo.Context) error {
+	c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_BEGIN, "SessionController.Create"}, constant.LOG_SEPARATOR))
+	defer c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_END, "SessionController.Create"}, constant.LOG_SEPARATOR))
+
 	s := &model.Session{}
 
 	if err := c.Bind(s); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	if err := c.Validate(s); err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
@@ -34,13 +39,16 @@ func (sc *SessionController) Create(c echo.Context) error {
 
 	t, err := sc.su.CreateSession(ctx, s)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, map[string]string{"token": t, "username": s.Username})
 }
 
 func (sc *SessionController) GetUsernameFromToken(c echo.Context) error {
+	c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_BEGIN, "SessionController.GetUsernameFromToken"}, constant.LOG_SEPARATOR))
+	defer c.Logger().Info(strings.Join([]string{constant.LOG_METHOD_END, "SessionController.GetUsernameFromToken"}, constant.LOG_SEPARATOR))
+
 	token, err := GetTokenFromHeader(c)
 	if err != nil {
 		return err
@@ -49,7 +57,7 @@ func (sc *SessionController) GetUsernameFromToken(c echo.Context) error {
 	name, err := sc.su.GetUsernameFromToken(token)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.ErrorResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, map[string]string{"username": name})
