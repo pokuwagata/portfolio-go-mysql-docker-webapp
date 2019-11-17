@@ -20,14 +20,25 @@ func NewUserRepository(db *sql.DB, e *echo.Echo) *UserRepository {
 }
 
 func (ur *UserRepository) Store(ctx context.Context, u *model.User) error {
-	query := `INSERT users SET username=?, password=?, status_id=(SELECT id FROM user_statuses where status= ?)`
-	stmt, err := ur.db.PrepareContext(ctx, query)
-	if err != nil {
-		return err
-	}
+	query := []string{
+		"INSERT users",
+		"SET",
+			"username = ?,",
+			"password = ?,",
+			"status_id =(",
+				"SELECT",
+					"id",
+				"FROM user_statuses",
+				"where",
+					"status = ?",
+			")",
+		}
 
-	_, err = stmt.ExecContext(ctx, u.Username, u.Password, u.Status)
-	if err != nil {
+	rawQuery := strings.Join(query, constant.HALF_SPACE);
+
+	if _, err := ur.db.ExecContext(ctx, rawQuery, u.Username, u.Password, u.Status); err != nil {
+		ur.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
+		ur.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
 		return err
 	}
 
@@ -36,10 +47,29 @@ func (ur *UserRepository) Store(ctx context.Context, u *model.User) error {
 
 func (ur *UserRepository) GetPassword(ctx context.Context, s *model.Session) (string, error) {
 	var p string
-	query := `SELECT password FROM users WHERE username=? AND status_id=(SELECT id FROM user_statuses where status= ?)`
+	query := []string{
+		"SELECT",
+			"password",
+		"FROM users",
+		"WHERE",
+			"username = ?",
+			"AND status_id =(",
+				"SELECT",
+					"id",
+				"FROM user_statuses",
+				"where",
+					"status = ?",
+			")",
+		}
+
+	rawQuery := strings.Join(query, constant.HALF_SPACE);
+
 	// usernameはユニークキー
-	if err := ur.db.QueryRowContext(ctx, query, s.Username, constant.VALID).Scan(&p); err != nil {
-		return "", errors.New("user not found")
+	if err := ur.db.QueryRowContext(ctx, rawQuery, s.Username, constant.VALID).Scan(&p); err != nil {
+		err := errors.New(constant.ERR_USER_NOT_FOUND)
+		ur.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
+		ur.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
+		return "", err
 	}
 	return p, nil
 }
