@@ -34,8 +34,8 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
         flushDispath({
           type: FlushActionType.HIDDEN,
         });
-        setArticleList(json.articles);
-        json.maxNumber && setMaxNumber(json.maxNumber);
+        setArticleList(json.articles); // 0件の場合は空の配列になる
+        Number.isInteger(json.maxNumber) && setMaxNumber(json.maxNumber);
         setLoading(false);
       } else {
         throw new Error(json.message);

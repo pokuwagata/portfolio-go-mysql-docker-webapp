@@ -69,9 +69,13 @@ export const Pagination = (props: PaginationProps) => {
     }
   };
 
+  const shouldHidden = () => {
+    return props.loading || props.maxPageNumber === 0
+  }
+
   return (
     <div className="d-flex justify-content-center mb-5">
-      {props.loading ? null : (
+      {shouldHidden() ? null : (
         <nav aria-label="Page navigation example">
           <ul className="pagination">
             {mode !== Mode.Left && mode !== Mode.None && (

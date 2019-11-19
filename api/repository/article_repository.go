@@ -269,10 +269,8 @@ func (ar *ArticleRepository) GetByPageNumber(ctx context.Context, n int, searchP
 		_ = rows.Scan(&a.ID, &a.Title, &a.Content, &a.UpdatedAt, &a.Username)
 		articles = append(articles, a)
 	} else {
-		err := errors.New(constant.ERR_ARTICLE_NOT_FOUND)
-		ar.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
-		ar.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
-		return nil, err
+		// 0件の場合は空を渡す
+		return []model.ViewArticle{}, nil
 	}
 
 	for rows.Next() {
