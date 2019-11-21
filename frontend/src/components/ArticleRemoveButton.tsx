@@ -10,8 +10,14 @@ export interface ArticleRemoveButtonProps {
 export const ArticleRemoveButton = (props: ArticleRemoveButtonProps) => {
   const flushDispath = React.useContext(FlushDispatchContext);
 
+  const isActivated = !!props.id;
+
   const onClickButton = async (event: React.MouseEvent, id: number) => {
     event.preventDefault();
+    if(!isActivated) {
+      return
+    }
+
     try {
       const res = await fetch('api/admin/article?id=' + id, {
         method: 'DELETE',
@@ -47,7 +53,8 @@ export const ArticleRemoveButton = (props: ArticleRemoveButtonProps) => {
   return (
     <button
       type="button"
-      className="btn btn-danger"
+      className={`btn btn-danger ${isActivated ? "" : "disabled"}`}
+      style={{cursor: isActivated ? "pointer" : "not-allowed"}}
       onClick={(event: React.MouseEvent) => onClickButton(event, props.id)}
     >
       選択した記事を削除

@@ -35,6 +35,7 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
           type: FlushActionType.HIDDEN,
         });
         setArticleList(json.articles); // 0件の場合は空の配列になる
+        setSelected(null) // 記事再取得時は記事の選択状態をリセット
         Number.isInteger(json.maxNumber) && setMaxNumber(json.maxNumber);
         setLoading(false);
       } else {
