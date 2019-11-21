@@ -30,12 +30,13 @@ func NewSessionUsecase(ur *repository.UserRepository, e *echo.Echo) *SessionUsec
 func (su *SessionUsecase) CreateSession(ctx context.Context, s *model.Session) (string, error) {
 	hash, err := su.ur.GetPassword(ctx, s)
 	if err != nil {
+		err = errors.New(constant.ERR_SIGNUP_FAILED)
 		return "", err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(s.Password)); err != nil {
 		su.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
 		su.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
-		return "", errors.New(constant.ERR_INVALID_PASSWORD)
+		return "", errors.New(constant.ERR_SIGNUP_FAILED)
 	}
 
 	claims := &jwtauth.JwtCustomClaims{

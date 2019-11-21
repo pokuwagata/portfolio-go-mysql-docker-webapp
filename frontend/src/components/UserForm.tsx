@@ -13,7 +13,6 @@ export type FormDetail = {
   formType: FormType;
   requestUri: string;
   successMsg: string;
-  errorMsg: string;
   titleText: string;
   buttonText: string;
 };
@@ -22,7 +21,6 @@ export type UserFormProps = {
   formDetail: FormDetail;
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
-  // setFlushState: (state: FlushState) => void;
   setLoginUsername: (state: boolean) => void;
 };
 
@@ -81,7 +79,6 @@ export const UserForm = (props: UserFormProps) => {
             type: FlushActionType.VISIBLE,
             payload: {
               type: FlushType.ERROR,
-              // message: props.formDetail.errorMsg,
               message: error.message,
             },
           });

@@ -15,7 +15,6 @@ export const Signup = (props: SignupProps) => {
     formType : FormType.SIGNUP,
     requestUri: 'api/user',
     successMsg : 'ユーザの登録に成功しました',
-    errorMsg: 'エラーが発生しました。管理者にお問い合わせください',
     titleText : 'ユーザを登録する',
     buttonText : '登録'
   }} {...props}></UserForm>

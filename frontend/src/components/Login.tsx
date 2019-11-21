@@ -15,7 +15,6 @@ export const Login = (props: LoginProps) => {
     formType : FormType.LOGIN,
     requestUri: 'api/session',
     successMsg : 'ログインに成功しました',
-    errorMsg: 'エラーが発生しました。管理者にお問い合わせください',
     titleText : 'ログインする',
     buttonText : 'ログイン'
   }} {...props}></UserForm>
