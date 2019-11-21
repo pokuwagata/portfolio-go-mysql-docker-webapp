@@ -11,5 +11,5 @@ ReactDOM.render(
     <ScrollToTop />
     <App />
   </BrowserRouter>,
-  document.getElementById('example')
+  document.getElementById('app-root')
 );
