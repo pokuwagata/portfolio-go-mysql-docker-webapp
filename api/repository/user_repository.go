@@ -5,6 +5,7 @@ import (
 	"api/model"
 	"context"
 	"database/sql"
+	"strconv"
 	"strings"
 	"github.com/pkg/errors"
 	"github.com/labstack/echo"
@@ -99,5 +100,7 @@ func (ur *UserRepository) GetIdByUsername(ctx context.Context, name string) (int
 		ur.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
 		return 0, err 
 	}
+
+	ur.e.Logger.Infof(strings.Join([]string{"userId", "=", strconv.Itoa(id)}, constant.HALF_SPACE))
 	return id, nil
 }

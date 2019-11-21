@@ -27,7 +27,7 @@ func main() {
 
 	ur := repository.NewUserRepository(db, e)
 	ar := repository.NewArticleRepository(db, e)
-	uu := usecase.NewUserUsecase(ur)
+	uu := usecase.NewUserUsecase(ur, e)
 	su := usecase.NewSessionUsecase(ur, e)
 	au := usecase.NewArticleUsecase(ar, ur, su)
 	sc := controller.NewSessionController(su)

@@ -76,12 +76,13 @@ export const UserForm = (props: UserFormProps) => {
           throw new Error((res as any).json.message);
         }
       })
-      .catch(error => {
+      .catch((error:Error) => {
           flushDispath({
             type: FlushActionType.VISIBLE,
             payload: {
               type: FlushType.ERROR,
-              message: props.formDetail.errorMsg,
+              // message: props.formDetail.errorMsg,
+              message: error.message,
             },
           });
       });

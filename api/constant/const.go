@@ -13,9 +13,11 @@ const (
 	ERR_INVALID_REQUEST_PARAM = "リクエストパラメータが不正です"
 	ERR_ARTICLE_NOT_FOUND = "記事が見つかりません"
 	ERR_USER_NOT_FOUND = "ユーザが見つかりません"
+	ERR_USER_EXISTED = "既に登録済みのユーザ名です。別のユーザ名を入力してください。"
 	ERR_TOKEN_NOT_FOUND = "JWTトークンが見つかりません"
 	ERR_INVALID_TOKEN = "不正なJWTトークンです"
 	ERR_INVALID_PASSWORD = "パスワードが間違っています"
+
 
 	ERR_SQL_MESSAGE = LOG_ERROR_MARK + HALF_SPACE + "SQL ERROR:" + HALF_SPACE + "%s"
 	ERR_SQL_MESSAGE_DEBUG = LOG_DEBUG_MARK + HALF_SPACE + "SQL ERROR:" + HALF_SPACE + "%+v"
