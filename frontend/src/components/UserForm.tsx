@@ -128,7 +128,7 @@ export const UserForm = (props: UserFormProps) => {
   };
 
   return props.isLoggedIn ? (
-    <Redirect to="/" />
+    <Redirect to="/management" />
   ) : (
     <div className="justify-content-center d-flex">
       <div className="mx-auto" style={{ flex: '0 0 400px' }}>
