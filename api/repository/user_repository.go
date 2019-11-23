@@ -94,6 +94,8 @@ func (ur *UserRepository) GetIdByUsername(ctx context.Context, name string) (int
 
 	rawQuery := strings.Join(query, constant.HALF_SPACE);
 
+	ur.e.Logger.Infof(strings.Join([]string{"username", "=", name}, constant.HALF_SPACE))
+
 	if err := ur.db.QueryRowContext(ctx, rawQuery, name, constant.VALID).Scan(&id); err != nil {
 		err := errors.New(constant.ERR_USER_NOT_FOUND)
 		ur.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
@@ -103,4 +105,39 @@ func (ur *UserRepository) GetIdByUsername(ctx context.Context, name string) (int
 
 	ur.e.Logger.Infof(strings.Join([]string{"userId", "=", strconv.Itoa(id)}, constant.HALF_SPACE))
 	return id, nil
+}
+
+func (ur *UserRepository) Exists(ctx context.Context, name string) (bool, error) {
+	query := []string{
+		"SELECT",
+			"count(id)",
+		"FROM users",
+		"WHERE",
+			"username = ?",
+			"AND status_id =(",
+				"SELECT",
+					"id",
+				"FROM user_statuses",
+				"where",
+					"status = ?",
+			")",
+	}
+
+	rawQuery := strings.Join(query, constant.HALF_SPACE);
+
+	ur.e.Logger.Infof(strings.Join([]string{"username", "=", name}, constant.HALF_SPACE))
+
+	var count int
+	exists := false
+	if err := ur.db.QueryRowContext(ctx, rawQuery, name, constant.VALID).Scan(&count); err != nil {
+		ur.e.Logger.Errorf(constant.ERR_APP_ERROR, err)
+		ur.e.Logger.Debugf(constant.ERR_APP_ERROR_DEBUG, errors.WithStack(err))
+		return exists, err 
+	}
+
+	if count > 0 {
+		exists = true
+	}
+
+	return exists, nil
 }

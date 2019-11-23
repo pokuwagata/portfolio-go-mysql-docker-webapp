@@ -21,7 +21,12 @@ func NewUserUsecase(r UserRepository, e *echo.Echo) *UserUsecase {
 func (uu *UserUsecase) CreateUser(ctx context.Context, u *model.User) error {
 	u.Status = constant.VALID
 
-	if id, _ := uu.r.GetIdByUsername(ctx, u.Username); id != 0 {
+	exists, err := uu.r.Exists(ctx, u.Username);
+	if err != nil {
+		return err
+	}
+
+	if exists {
 		// ユーザが既に存在する場合
 		err := errors.New(constant.ERR_USER_EXISTED)
 		uu.e.Logger.Errorf(constant.ERR_APP_ERROR, err)

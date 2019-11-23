@@ -11,11 +11,12 @@ import (
 )
 
 type UserController struct {
-	u *usecase.UserUsecase
+	uu *usecase.UserUsecase
+	su *usecase.SessionUsecase
 }
 
-func NewUserController(u *usecase.UserUsecase) *UserController {
-	return &UserController{u}
+func NewUserController(uu *usecase.UserUsecase, su *usecase.SessionUsecase) *UserController {
+	return &UserController{uu, su}
 }
 
 func (uc *UserController) Create(c echo.Context) error {
@@ -31,15 +32,22 @@ func (uc *UserController) Create(c echo.Context) error {
 		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
+	s := &model.Session{Username: u.Username, Password: u.Password}
+
 	ctx := c.Request().Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	err := uc.u.CreateUser(ctx, u)
+	err := uc.uu.CreateUser(ctx, u)
 	if err != nil {
 		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, constant.SUCCESS_MESSAGE)
+	token, err := uc.su.CreateSession(ctx, s)
+	if err != nil {
+		return GetErrorResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, map[string]string{"token": token, "username": s.Username})
 }

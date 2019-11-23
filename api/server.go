@@ -31,7 +31,7 @@ func main() {
 	su := usecase.NewSessionUsecase(ur, e)
 	au := usecase.NewArticleUsecase(ar, ur, su)
 	sc := controller.NewSessionController(su)
-	uc := controller.NewUserController(uu)
+	uc := controller.NewUserController(uu, su)
 	ac := controller.NewArticleController(au)
 	router.Init(e, uc, sc, ac)
 	port, _ := strconv.Atoi(os.Args[1])

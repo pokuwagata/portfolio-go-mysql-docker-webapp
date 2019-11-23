@@ -13,6 +13,7 @@ func Init(
 	sc *controller.SessionController,
 	ac *controller.ArticleController) {
 	// 認証・認可が不要なルーティング
+	// TODO: 削除
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
