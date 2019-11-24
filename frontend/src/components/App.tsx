@@ -11,7 +11,7 @@ import { ArticleManagement } from './ArticleManagement';
 import { FlushProvider } from './FlushProvider';
 import { ArticleDetail } from './ArticleDetail';
 import { PrivateRoute } from './PrivateRoute';
-import * as Const from '../const'
+import * as Const from '../const';
 
 type AppProps = {};
 type AppState = {};
@@ -31,44 +31,42 @@ export const App = (props: AppProps) => {
   const [loginUsername, setLoginUsername] = React.useState();
 
   React.useEffect(() => {
+    fetchSession();
+  }, []); // マウント時のみ実行するため[]を渡す
+
+  const fetchSession = async () => {
     const token = localStorage.getItem(Const.jwtTokenKey);
     if (!token) {
       setIsLoggedIn(false);
       setLoginUsername('');
     } else {
-      fetch('api/admin/session', {
-        method: 'GET',
-        headers: { Authorization: 'Bearer' + ' ' + token },
-      })
-        .then(res => {
-          return new Promise(resolve =>
-            res.json().then(json =>
-              resolve({
-                ok: res.ok,
-                json,
-              })
-            )
-          );
-        })
-        .then(res => {
-          if ((res as getSessionResponse).ok) {
-            setIsLoggedIn(true);
-            setLoginUsername((res as getSessionResponse).loginUsername);
-          } else {
-            throw new Error();
-          }
-        })
-        .catch(() => {
-          // TODO: エラーフラッシュの設定
-          setIsLoggedIn(false);
-          setLoginUsername('');
+      try {
+        const res = await fetch('api/admin/session', {
+          method: 'GET',
+          headers: { Authorization: 'Bearer' + ' ' + token },
         });
+        const json = await res.json();
+        if (res.ok) {
+          setIsLoggedIn(true);
+          setLoginUsername(json.username);
+        } else {
+          throw new Error();
+        }
+      } catch (error) {
+        // TODO: エラーフラッシュの設定
+        setIsLoggedIn(false);
+        setLoginUsername('');
+      }
     }
-  }, []); // マウント時のみ実行するため[]を渡す
+  };
 
   return (
     <div>
-      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      <Header
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        username={loginUsername}
+      />
       <FlushProvider>
         <div className="container">
           <Switch>
@@ -105,10 +103,7 @@ export const App = (props: AppProps) => {
             <PrivateRoute path="/management" isLoggedIn={isLoggedIn}>
               <ArticleManagement />
             </PrivateRoute>
-            <Route
-              path="/article"
-              render={() => <ArticleDetail />}
-            />
+            <Route path="/article" render={() => <ArticleDetail />} />
           </Switch>
         </div>
       </FlushProvider>

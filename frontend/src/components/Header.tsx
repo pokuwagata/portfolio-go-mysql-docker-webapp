@@ -5,6 +5,7 @@ import { SignoutButton } from './SignoutButton';
 export interface HeaderProps {
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
+  username: string;
 }
 
 export const Header = (props: HeaderProps) => (
@@ -12,6 +13,7 @@ export const Header = (props: HeaderProps) => (
     <div className="navbar-collapse">
       <ul className="navbar-nav mr-auto">
         <HeaderButton name="Home" path="/" />
+        {props.isLoggedIn ? <li className="navbar-text" style={{marginLeft: "1rem"}}>ユーザ:{props.username}</li> : null}
       </ul>
       <ul className="navbar-nav">
         {props.isLoggedIn ? (
