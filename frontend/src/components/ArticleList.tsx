@@ -5,9 +5,7 @@ import { Pagination } from './Pagination';
 import { ArticleRow } from './ArticleRow';
 import * as Const from '../const'
 
-export interface ArticleListProps {}
-
-export const ArticleList = (props: ArticleListProps) => {
+export const ArticleList = () => {
   const [loading, setLoading] = React.useState(true);
   const [articleList, setArticleList] = React.useState([]);
   const [pageNumber, setPageNumber] = React.useState(1);

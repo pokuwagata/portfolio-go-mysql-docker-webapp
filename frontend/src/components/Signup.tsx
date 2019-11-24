@@ -1,10 +1,7 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
-import { FlushState } from './App';
 import { UserForm, FormType } from './UserForm';
 
-// TODO: RouteComponentPropsは必要？
-export type SignupProps = RouteComponentProps & {
+export type SignupProps = {
   isLoggedIn: boolean;
   setIsLoggedIn: (state: boolean) => void;
   setLoginUsername: (state: boolean) => void;

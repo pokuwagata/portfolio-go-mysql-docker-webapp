@@ -3,11 +3,7 @@ import { FlushType } from './Flush';
 import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 import { useLocation, Redirect, Link } from 'react-router-dom';
 
-export interface ArticleDetailProps {
-  isLoggedIn: boolean;
-}
-
-export const ArticleDetail = (props: ArticleDetailProps) => {
+export const ArticleDetail = () => {
   const [loading, setLoading] = React.useState(true);
   const flushDispath = React.useContext(FlushDispatchContext);
   const [article, setArticle] = React.useState({

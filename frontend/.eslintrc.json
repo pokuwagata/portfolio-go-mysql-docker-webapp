@@ -1,10 +1,21 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true
-    },
-    "rules": {
-      "no-unused-vars": "error",
-      "no-unreachable": "error"
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "extends": ["plugin:react/recommended"],
+  "settings": {
+    "react": {
+      "version": "16.8"
     }
+  },
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "error",
+    "no-unreachable": "error"
+  }
 }

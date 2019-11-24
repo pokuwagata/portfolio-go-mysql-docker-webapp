@@ -6,12 +6,7 @@ import { ArticleRemoveButton } from './ArticleRemoveButton';
 import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 import * as Const from '../const';
 
-export interface ArticleManagementProps {
-  isLoggedIn: boolean;
-  setIsLoggedIn: (state: boolean) => void;
-}
-
-export const ArticleManagement = (props: ArticleManagementProps) => {
+export const ArticleManagement = () => {
   const [loading, setLoading] = React.useState(true);
   const [articleList, setArticleList] = React.useState([]);
   const [pageNumber, setPageNumber] = React.useState(1);

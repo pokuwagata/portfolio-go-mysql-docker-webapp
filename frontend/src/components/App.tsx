@@ -28,11 +28,6 @@ type getSessionResponse = {
 
 export const App = (props: AppProps) => {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [flushState, setFlushState] = React.useState<FlushState>({
-    isDisplay: false,
-    type: undefined,
-    message: '',
-  });
   const [loginUsername, setLoginUsername] = React.useState();
 
   React.useEffect(() => {
@@ -63,7 +58,7 @@ export const App = (props: AppProps) => {
             throw new Error();
           }
         })
-        .catch(error => {
+        .catch(() => {
           // TODO: エラーフラッシュの設定
           setIsLoggedIn(false);
           setLoginUsername('');
@@ -108,15 +103,11 @@ export const App = (props: AppProps) => {
               />
             </PrivateRoute>
             <PrivateRoute path="/management" isLoggedIn={isLoggedIn}>
-              <ArticleManagement
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-                {...props} // TODO: 不要な場合は削除する
-              />
+              <ArticleManagement />
             </PrivateRoute>
             <Route
               path="/article"
-              render={() => <ArticleDetail isLoggedIn={isLoggedIn} />}
+              render={() => <ArticleDetail />}
             />
           </Switch>
         </div>
