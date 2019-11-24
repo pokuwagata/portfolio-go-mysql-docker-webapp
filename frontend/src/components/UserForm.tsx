@@ -144,6 +144,7 @@ export const UserForm = (props: UserFormProps) => {
               placeholder="ユーザ名を入力"
               maxLength={16}
               onChange={e => setUsername(e.target.value)}
+              autoFocus
             />
             {usernameErrors.length > 0 && (
               <div className="invalid-feedback">{usernameErrors.join('')}</div>
