@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { HeaderButton } from './HeaderButton';
+import { SignoutButton } from './SignoutButton';
 
 export interface HeaderProps {
   isLoggedIn: boolean;
+  setIsLoggedIn: (state: boolean) => void;
 }
 
 export const Header = (props: HeaderProps) => (
@@ -16,6 +18,7 @@ export const Header = (props: HeaderProps) => (
           <>
             <HeaderButton name="投稿する" path="/post" />
             <HeaderButton name="管理" path="/management" />
+            <SignoutButton setIsLoggedIn={props.setIsLoggedIn}></SignoutButton>
           </>
         ) : (
           <>

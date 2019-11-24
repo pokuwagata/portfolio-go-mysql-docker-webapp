@@ -10,6 +10,8 @@ import { ArticlePost } from './ArticlePost';
 import { ArticleManagement } from './ArticleManagement';
 import { FlushProvider } from './FlushProvider';
 import { ArticleDetail } from './ArticleDetail';
+import { PrivateRoute } from './PrivateRoute';
+import * as Const from '../const'
 
 type AppProps = {};
 type AppState = {};
@@ -34,7 +36,7 @@ export const App = (props: AppProps) => {
   const [loginUsername, setLoginUsername] = React.useState();
 
   React.useEffect(() => {
-    const token = localStorage.getItem('portfolio-jwt-token');
+    const token = localStorage.getItem(Const.jwtTokenKey);
     if (!token) {
       setIsLoggedIn(false);
       setLoginUsername('');
@@ -71,7 +73,7 @@ export const App = (props: AppProps) => {
 
   return (
     <div>
-      <Header isLoggedIn={isLoggedIn} />
+      <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       <FlushProvider>
         <div className="container">
           <Switch>
@@ -98,26 +100,20 @@ export const App = (props: AppProps) => {
                 />
               )}
             />
-            <Route
-              path="/post"
-              render={props => (
-                <ArticlePost
-                  isLoggedIn={isLoggedIn}
-                  setIsLoggedIn={setIsLoggedIn}
-                  {...props}
-                />
-              )}
-            />
-            <Route
-              path="/management"
-              render={props => (
-                <ArticleManagement
-                  isLoggedIn={isLoggedIn}
-                  setIsLoggedIn={setIsLoggedIn}
-                  {...props} // TODO: 不要な場合は削除する
-                />
-              )}
-            />
+            <PrivateRoute path="/post" isLoggedIn={isLoggedIn}>
+              <ArticlePost
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+                {...props}
+              />
+            </PrivateRoute>
+            <PrivateRoute path="/management" isLoggedIn={isLoggedIn}>
+              <ArticleManagement
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+                {...props} // TODO: 不要な場合は削除する
+              />
+            </PrivateRoute>
             <Route
               path="/article"
               render={() => <ArticleDetail isLoggedIn={isLoggedIn} />}

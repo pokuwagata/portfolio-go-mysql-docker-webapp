@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Redirect, RouteComponentProps } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { FlushType } from './Flush';
-import { FlushState } from './App';
 import { FlushActionType, FlushDispatchContext } from './FlushProvider';
+import * as Const from '../const'
 
 export enum FormType {
   SIGNUP,
@@ -67,7 +67,7 @@ export const UserForm = (props: UserFormProps) => {
               message: props.formDetail.successMsg,
             },
           });
-          localStorage.setItem('portfolio-jwt-token', (res as any).json.token);
+          localStorage.setItem(Const.jwtTokenKey, (res as any).json.token);
           props.setIsLoggedIn(true);
           props.setLoginUsername((res as any).json.username);
         } else {

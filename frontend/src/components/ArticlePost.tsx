@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Redirect, useLocation } from 'react-router-dom';
 import { FlushType } from './Flush';
 import { FlushDispatchContext, FlushActionType } from './FlushProvider';
+import * as Const from '../const'
 
 export type ArticlePostProps = {
   isLoggedIn: boolean;
@@ -73,7 +74,7 @@ export const ArticlePost = (props: ArticlePostProps) => {
         headers: {
           'content-type': 'application/json',
           Authorization:
-            'Bearer ' + localStorage.getItem('portfolio-jwt-token'),
+            'Bearer ' + localStorage.getItem(Const.jwtTokenKey),
         },
         body: JSON.stringify({
           title: title,

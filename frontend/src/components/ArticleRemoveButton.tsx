@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FlushType } from './Flush';
 import { FlushDispatchContext, FlushActionType } from './FlushProvider';
+import * as Const from '../const'
 
 export interface ArticleRemoveButtonProps {
   fetchArticles: (pageNumber: number) => void;
@@ -23,7 +24,7 @@ export const ArticleRemoveButton = (props: ArticleRemoveButtonProps) => {
         method: 'DELETE',
         headers: {
           Authorization:
-            'Bearer ' + localStorage.getItem('portfolio-jwt-token'),
+            'Bearer ' + localStorage.getItem(Const.jwtTokenKey),
         },
       });
       const json = await res.json();

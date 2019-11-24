@@ -1,0 +1,1 @@
+export const jwtTokenKey = 'portfolio-jwt-token';

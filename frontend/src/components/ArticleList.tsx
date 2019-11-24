@@ -3,6 +3,7 @@ import { FlushType } from './Flush';
 import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 import { Pagination } from './Pagination';
 import { ArticleRow } from './ArticleRow';
+import * as Const from '../const'
 
 export interface ArticleListProps {}
 
@@ -22,7 +23,7 @@ export const ArticleList = (props: ArticleListProps) => {
         headers: {
           'content-type': 'application/json',
           Authorization:
-            'Bearer ' + localStorage.getItem('portfolio-jwt-token'),
+            'Bearer ' + localStorage.getItem(Const.jwtTokenKey),
         },
       });
       const json = await res.json();

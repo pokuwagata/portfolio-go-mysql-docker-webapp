@@ -4,6 +4,7 @@ import { FlushType } from './Flush';
 import { Pagination } from './Pagination';
 import { ArticleRemoveButton } from './ArticleRemoveButton';
 import { FlushDispatchContext, FlushActionType } from './FlushProvider';
+import * as Const from '../const';
 
 export interface ArticleManagementProps {
   isLoggedIn: boolean;
@@ -25,8 +26,7 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
         method: 'GET',
         headers: {
           'content-type': 'application/json',
-          Authorization:
-            'Bearer ' + localStorage.getItem('portfolio-jwt-token'),
+          Authorization: 'Bearer ' + localStorage.getItem(Const.jwtTokenKey),
         },
       });
       const json = await res.json();
@@ -35,7 +35,7 @@ export const ArticleManagement = (props: ArticleManagementProps) => {
           type: FlushActionType.HIDDEN,
         });
         setArticleList(json.articles); // 0件の場合は空の配列になる
-        setSelected(null) // 記事再取得時は記事の選択状態をリセット
+        setSelected(null); // 記事再取得時は記事の選択状態をリセット
         Number.isInteger(json.maxNumber) && setMaxNumber(json.maxNumber);
         setLoading(false);
       } else {
