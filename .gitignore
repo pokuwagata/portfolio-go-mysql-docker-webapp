@@ -3,8 +3,8 @@
 /.vscode
 /frontend/node_modules/
 /frontend/dist/*
-!/**/.gitkeep
-/api/logs/*
-/docs/api-example.yaml
-/api/requestSample/
 frontend/nginx/logs/*
+/api/logs/*
+/api/requestSample/
+!/**/.gitkeep
+/docs/api-example.yaml
