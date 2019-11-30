@@ -8,3 +8,4 @@ frontend/nginx/logs/*
 /api/requestSample/
 !/**/.gitkeep
 /docs/api-example.yaml
+.DS_Store

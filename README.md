@@ -4,16 +4,20 @@
 
 simple webApp sample (React + Go + MySQL)
 
-## Features
+## ScreenShot
 
-- Docker based environment
-- Using Docker-Compose for local development
-- Testing on CircleCI
+Home
 
-## Requirements
+![Top](./docs/imgs/top.png)
 
-- Docker Compose
+Management Screen
 
-## Getting Started
+![Management](./docs/imgs/management.png)
 
-`$ docker-compose up -d`
+Edit Article
+
+![Post](./docs/imgs/post.png)
+
+## System Overview
+
+![System overview](./docs/imgs/overview.png)
