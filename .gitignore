@@ -1,5 +1,5 @@
 /mysql/data/*
-/mysql/logs/*
+/mysql/logs/general.log
 /.vscode
 /frontend/node_modules/
 /frontend/dist/*
