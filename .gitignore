@@ -1,3 +1,4 @@
+/bff/node_modules/
 /mysql/data/*
 /mysql/logs/general.log
 /.vscode
