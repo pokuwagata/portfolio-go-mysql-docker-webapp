@@ -48,3 +48,11 @@ services:
     volumes:
       - ./frontend/dist:/frontend/dist
       - ./frontend/src:/frontend/src
+  
+  bff:
+    build:
+      context: ./bff
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./bff/src:/bff/src
