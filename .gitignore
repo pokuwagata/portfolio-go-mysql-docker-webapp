@@ -1,6 +1,6 @@
 /bff/node_modules/
 /mysql/data/*
-/mysql/logs/general.log
+/mysql/logs/*
 /.vscode
 /frontend/node_modules/
 /frontend/dist/*
