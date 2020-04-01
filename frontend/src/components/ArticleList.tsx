@@ -4,6 +4,8 @@ import { FlushDispatchContext, FlushActionType } from './FlushProvider';
 import { Pagination } from './Pagination';
 import { ArticleRow } from './ArticleRow';
 import * as Const from '../const'
+import { Query } from 'react-apollo';
+import { gql } from 'apollo-boost';
 
 export const ArticleList = () => {
   const [loading, setLoading] = React.useState(true);
@@ -53,6 +55,12 @@ export const ArticleList = () => {
     window.scrollTo(0, 0);
   }, [pageNumber]);
 
+  const query = gql`
+    {
+      totalPhotos
+    }
+  `
+
   return (
     <div>
       <div className="container mb-5">
@@ -80,6 +88,9 @@ export const ArticleList = () => {
         setMaxPageNumber={setPageNumber}
         loading={loading}
       />
+      <Query query={query}>
+        {(result :any) => <p>{result.loading? 'loading' : result.data.totalPhotos}</p>}
+      </Query>
     </div>
   );
 };

@@ -5,8 +5,8 @@ RUN cd /tmp && npm install
 RUN mkdir /frontend && cp -a /tmp/node_modules /frontend
 
 WORKDIR /frontend
-COPY package*.json ./
-RUN npm install
+# COPY package*.json ./
+# RUN npm install
 COPY . .
 # CMD ["npm", "run", "start"]
 CMD /bin/bash

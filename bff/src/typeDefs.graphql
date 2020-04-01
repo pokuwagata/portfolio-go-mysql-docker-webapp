@@ -1,5 +1,5 @@
 type Query {
-  totalPhotos: Int!
+  totalPhotos: String!
 }
 type Mutation {
   postPhoto(name: String!, description: String): Boolean!

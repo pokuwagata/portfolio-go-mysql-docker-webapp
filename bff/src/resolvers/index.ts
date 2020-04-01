@@ -1,9 +1,13 @@
+import fetch from 'node-fetch';
+
 var photos = [];
 
 const resolvers = {
   Query: {
     // 写真を格納した配列の長さを返す
-    totalPhotos: () => photos.length
+    totalPhotos: async () => {
+      return await fetch('http://api:5000').then((res)=>res.text());
+    }
   },
   // postPhotoミューテーションと対応するリゾルバ
   Mutation: {

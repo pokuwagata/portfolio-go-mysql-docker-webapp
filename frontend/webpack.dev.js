@@ -14,6 +14,10 @@ module.exports = merge(common, {
       '/api': {
         target: 'http://api:5000',
         pathRewrite: {'^/api' : ''}
+      },
+      '/bff': {
+        target: 'http://bff:4000',
+        pathRewrite: {'^/bff' : ''}
       }
     }
   }
