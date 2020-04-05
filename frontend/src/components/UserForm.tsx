@@ -2,7 +2,9 @@ import * as React from 'react';
 import { Redirect } from 'react-router-dom';
 import { FlushType } from './Flush';
 import { FlushActionType, FlushDispatchContext } from './FlushProvider';
-import * as Const from '../const'
+import * as Const from '../const';
+import gql from 'graphql-tag';
+import { useMutation } from 'react-apollo';
 
 export enum FormType {
   SIGNUP,
@@ -29,8 +31,40 @@ export const UserForm = (props: UserFormProps) => {
   const [usernameErrors, setUsernameErrors] = React.useState([]);
   const [password, setPassword] = React.useState('');
   const [passwordErrors, setPasswordErrors] = React.useState([]);
+  const flushDispatch = React.useContext(FlushDispatchContext);
 
-  const flushDispath = React.useContext(FlushDispatchContext);
+  const CREATE_SESSION = gql`
+    mutation createSession($username: String, $password: String) {
+      createSession(input: { username: $username, password: $password }) {
+        token
+        username
+      }
+    }
+  `;
+  const [createSession] = useMutation(CREATE_SESSION, {
+    ignoreResults: false,
+    onCompleted: data => {
+        flushDispatch({
+          type: FlushActionType.VISIBLE,
+          payload: {
+            type: FlushType.SUCCESS,
+            message: props.formDetail.successMsg,
+          },
+        });
+        localStorage.setItem(Const.jwtTokenKey, data.createSession.token);
+        props.setIsLoggedIn(true);
+        props.setLoginUsername(data.createSession.username);
+    },
+    onError: err => {
+      flushDispatch({
+          type: FlushActionType.VISIBLE,
+          payload: {
+            type: FlushType.ERROR,
+            message: err.message,
+          },
+        });
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,50 +73,7 @@ export const UserForm = (props: UserFormProps) => {
     const isValidPassword = validatePassword();
     if (!(isValidUsername && isValidPassword)) return;
 
-    fetch(props.formDetail.requestUri, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    })
-      .then(res => {
-        return new Promise(resolve =>
-          res.json().then(json =>
-            resolve({
-              ok: res.ok,
-              json,
-            })
-          )
-        );
-      })
-      .then(res => {
-        // TODO: as any以外の方法
-        if ((res as any).ok) {
-          flushDispath({
-            type: FlushActionType.VISIBLE,
-            payload: {
-              type: FlushType.SUCCESS,
-              message: props.formDetail.successMsg,
-            },
-          });
-          localStorage.setItem(Const.jwtTokenKey, (res as any).json.token);
-          props.setIsLoggedIn(true);
-          props.setLoginUsername((res as any).json.username);
-        } else {
-          throw new Error((res as any).json.message);
-        }
-      })
-      .catch((error:Error) => {
-          flushDispath({
-            type: FlushActionType.VISIBLE,
-            payload: {
-              type: FlushType.ERROR,
-              message: error.message,
-            },
-          });
-      });
+    createSession({ variables: { username: username, password: password } });
   };
 
   const validateUsername = (): boolean => {

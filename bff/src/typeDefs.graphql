@@ -1,6 +1,18 @@
 type Query {
   totalPhotos: String!
 }
+
+input createSessionInput {
+  username: String
+  password: String
+}
+
+type SessionPayload {
+  token: String
+  username: String
+}
+
 type Mutation {
   postPhoto(name: String!, description: String): Boolean!
+  createSession(input: createSessionInput): SessionPayload
 }

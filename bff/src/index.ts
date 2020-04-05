@@ -3,13 +3,17 @@ import { Request, Response } from "express";
 import express from "express";
 import resolvers from "./resolvers";
 import expressPlayground from "graphql-playground-middleware-express";
-import 'graphql-import-node';
-import typeDefs from './typeDefs.graphql';
+import "graphql-import-node";
+import typeDefs from "./typeDefs.graphql";
 
 var app = express();
 
-const server = new ApolloServer({ typeDefs, resolvers });
-server.applyMiddleware({ app })
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  debug: true
+});
+server.applyMiddleware({ app });
 
 app.get(`/`, (req: Request, res: Response) => res.end(`hellooooooooo`));
 app.get(`/playground`, expressPlayground({ endpoint: `/graphql` }));
